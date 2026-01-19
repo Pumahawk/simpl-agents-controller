@@ -1,0 +1,3 @@
+[submodule "simpl-repo/authority-iaa"]
+	path = simpl-repo/authority-iaa
+	url = https://code.europa.eu/simpl/simpl-open/development/iaa/authority-iaa
