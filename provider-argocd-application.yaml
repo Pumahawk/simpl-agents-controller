@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: provider-iaa-01-deployer
+spec:
+  project: default
+  source:
+    repoURL: https://code.europa.eu/api/v4/projects/1402/packages/helm/stable
+    chart: provider-iaa
+    targetRevision: 0.0.1-F-feature-initial-commit.9.a048ffa4
+    helm:
+      values: |
+        values:
+          branch: feature/initial-commit
+
+        project: default
+
+        namespaceTag:
+          provider: provider01
+          common: common01
+
+        domainSuffix: sandbox-iaa.simpl-europe.eu
+
+        resourcePreset: default
+
+        argocd:
+          appname: provider01
+          namespace: argocd
+
+        cluster:
+          address: https://kubernetes.default.svc
+          namespace: provider01
+          commonToolsNamespace: common01
+          issuer: dev-prod-http
+
+        secrets:
+          role: sandbox-iaa-role
+          secretEngine: sandbox-iaa
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: provider01
