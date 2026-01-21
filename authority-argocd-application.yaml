@@ -7,8 +7,17 @@ spec:
   source:
     repoURL: https://code.europa.eu/api/v4/projects/1402/packages/helm/stable
     chart: authority-iaa
-    targetRevision: 1.0.0-F-feature-initial-commit.6.7ccf418a
+    targetRevision: 1.0.0-F-feature-initial-commit.13.bd30a317
     helm:
+      parameters:
+        - name: keycloak.resources.requests.memory
+          value: 1Gi
+        - name: keycloak.resources.requests.cpu
+          value: 500m
+        - name: keycloak.resources.limits.memory
+          value: 2Gi
+        - name: keycloak.resources.limits.cpu
+          value: "1"
       values: |
         values:
           branch: feature/initial-commit
@@ -19,7 +28,7 @@ spec:
           authority: authority01
           common: common01
 
-        domainSuffix: sandbox-iaa.simpl-europe.eu
+        domainSuffix: sandbox-ia    keycloak:
 
         resourcePreset: default
 

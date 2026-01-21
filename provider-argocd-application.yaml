@@ -5,10 +5,19 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://code.europa.eu/api/v4/projects/1402/packages/helm/stable
+    repoURL: https://code.europa.eu/api/v4/projects/1403/packages/helm/stable
     chart: provider-iaa
-    targetRevision: 0.0.1-F-feature-initial-commit.9.a048ffa4
+    targetRevision: 0.0.1-F-feature-initial-commit.11.1207ab3b
     helm:
+      parameters:
+        - name: keycloak.resources.requests.memory
+          value: 1Gi
+        - name: keycloak.resources.requests.cpu
+          value: 500m
+        - name: keycloak.resources.limits.memory
+          value: 2Gi
+        - name: keycloak.resources.limits.cpu
+          value: "1"
       values: |
         values:
           branch: feature/initial-commit
