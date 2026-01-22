@@ -25,7 +25,7 @@ spec:
         project: default
 
         namespaceTag:
-          provider: provider01
+          dataprovider: dataprovider01
           common: common01
 
         domainSuffix: sandbox-iaa.simpl-europe.eu
@@ -33,12 +33,12 @@ spec:
         resourcePreset: default
 
         argocd:
-          appname: provider01
+          appname: dataprovider01
           namespace: argocd
 
         cluster:
           address: https://kubernetes.default.svc
-          namespace: provider01
+          namespace: dataprovider01
           commonToolsNamespace: common01
           issuer: dev-prod-http
 
@@ -47,4 +47,4 @@ spec:
           secretEngine: sandbox-iaa
   destination:
     server: https://kubernetes.default.svc
-    namespace: provider01
+    namespace: dataprovider01
