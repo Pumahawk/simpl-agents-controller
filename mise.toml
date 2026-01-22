@@ -1,0 +1,87 @@
+[tools]
+kubectl = "1.34.1"
+
+[env]
+KUBECONFIG = "__REQUIRED_OVERRIDE__"
+AUTHORITY_NAMESPACE = "authority01"
+
+[tasks."cluster:authority-initialization"]
+shell = "bash -ec"
+run = """
+NAMESPACE="${AUTHORITY_NAMESPACE}"
+
+AUTH_PF_PORT=8105
+ID_PF_PORT=8103
+
+AUTH_SERVICE=authentication-provider
+ID_SERVICE=identity-provider
+
+cleanup() {
+  >&2 echo "Stopping port-forwards..."
+  [[ -n "$AUTH_PF_PID" ]] && kill "$AUTH_PF_PID" 2>/dev/null || true
+  [[ -n "$ID_PF_PID" ]] && kill "$ID_PF_PID" 2>/dev/null || true
+}
+
+trap cleanup EXIT INT TERM
+
+>&2 echo "Starting port-forward for $AUTH_SERVICE..."
+kubectl port-forward -n "$NAMESPACE" svc/$AUTH_SERVICE $AUTH_PF_PORT:8080 >/tmp/auth-pf.log 2>&1 &
+AUTH_PF_PID=$!
+
+>&2 echo "Starting port-forward for $ID_SERVICE..."
+kubectl port-forward -n "$NAMESPACE" svc/$ID_SERVICE $ID_PF_PORT:8080 >/tmp/id-pf.log 2>&1 &
+ID_PF_PID=$!
+
+wait_for_port() {
+  local port=$1
+  for i in {1..20}; do
+    if nc -z localhost "$port"; then
+      return 0
+    fi
+    sleep 0.5
+  done
+  >&2 echo "Port $port not available"
+  exit 1
+}
+
+>&2 echo "Waiting for port-forwards to be ready..."
+wait_for_port $AUTH_PF_PORT
+wait_for_port $ID_PF_PORT
+
+export AUTHORITY_AUTH_PROVIDER=localhost:$AUTH_PF_PORT
+export AUTHORITY_IDENTITY_PROVIDER=localhost:$ID_PF_PORT
+
+>&2 echo Generating keypair...
+curl -v -X POST "$AUTHORITY_AUTH_PROVIDER/v1/keypairs/generate"
+
+>&2 echo Generating CSR...
+curl -v -X POST "$AUTHORITY_AUTH_PROVIDER/v1/csr/generate" \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "commonName": "localhost",
+  "country": "it",
+  "organization": "test",
+  "organizationalUnit": "test"
+}' > csr.pem
+
+>&2 echo Creating Authority participant
+PARTICIPANT_ID=$(curl -v -X POST "$AUTHORITY_IDENTITY_PROVIDER/v1/participants" \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "organization": "test",
+  "participantType": "GOVERNANCE_AUTHORITY"
+}' | sed -E 's/^"(.*)"$/\\1/')
+
+>&2 echo Uploading CSR ..
+>&2 echo "Participant id: $PARTICIPANT_ID"
+curl -X POST "$AUTHORITY_IDENTITY_PROVIDER/v1/participants/$PARTICIPANT_ID/csr" \
+-F "csr=@csr.pem"
+
+>&2 echo Downloading credentials ...
+curl "$AUTHORITY_IDENTITY_PROVIDER/v1/credentials/$PARTICIPANT_ID/download" \
+-o cert.pem
+
+>&2 echo Uploading credentials ...
+curl -v -H "Authorization: Bearer $TMP_TOKEN" -X POST "$AUTHORITY_AUTH_PROVIDER/v1/credentials" \
+-F "credential=@cert.pem"
+"""
