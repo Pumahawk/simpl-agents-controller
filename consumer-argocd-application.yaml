@@ -47,4 +47,4 @@ spec:
           secretEngine: sandbox-iaa
   destination:
     server: https://kubernetes.default.svc
-    namespace: authority01
+    namespace: consumer01
