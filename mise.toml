@@ -5,6 +5,10 @@ kubectl = "1.34.1"
 KUBECONFIG = "__REQUIRED_OVERRIDE__"
 AUTHORITY_NAMESPACE = "authority01"
 
+[tasks."logs"]
+shell = "bash -c"
+run = "klog --kubeconfig=\"${KUBECONFIG}\" --config klog/conf.yaml -sort"
+
 [tasks."cluster:authority-initialization"]
 shell = "bash -ec"
 run = """

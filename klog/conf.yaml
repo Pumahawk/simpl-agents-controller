@@ -1,0 +1,128 @@
+templates:
+  basicMessage: '{{ printf "%-46s" .Name }} {{ printf "%-46s" .PodName}} {{ .Message }}'
+  basicMessageAndPodInfo: '{{ printf "%s/%s" .Namespace .PodName }} {{ .Message }}'
+  withJq: '{{ printf "%-46s" .Name }} {{ jq .Message .Vars.jqtemplate }}'
+  withJqAndPodInfo: '{{ printf "%s/%s" .Namespace .PodName }} {{ jq .Message .Vars.jqtemplate }}'
+  hpipeMessage: '{{ printf "%-20s" .Name }} {{ .Message }}'
+  toJson: |
+    {{with $mm := jq .Message .Vars.jqRoot -}}
+      {{- mapAdd $mm "name" $.Name | jsonEncode -}}
+    {{- else -}}
+      NONE
+    {{- end -}}
+  withTextMessage: '{{ template "basicMessage" . }}'
+  withJsonMessage: '{{ template "withJq" . }}'
+vars:
+  jqtemplate: >
+    "\(.timestamp) \(.level) \(.message) \(."error.stack_trace" // "")"
+  jqRoot: .
+logs:
+
+  - namespace: "authority01"
+    template: '{{ template "withJq" . }}'
+    name: "authority01/authentication-provider"
+    labels: "app.kubernetes.io/name=authentication-provider"
+    tags: [ "env:authority01", "name:authentication-provider"]
+
+  - namespace: "authority01"
+    template: '{{ template "withJq" . }}'
+    name: "authority01/identity-provider"
+    labels: "app.kubernetes.io/name=identity-provider"
+    tags: [ "env:authority01", "name:identity-provider"]
+
+  - namespace: "authority01"
+    template: '{{ template "withJq" . }}'
+    name: "authority01/onboarding"
+    labels: "app.kubernetes.io/name=onboarding"
+    tags: [ "env:authority01", "name:onboarding"]
+
+  - namespace: "authority01"
+    template: '{{ template "withJq" . }}'
+    name: "authority01/security-attributes-provider"
+    labels: "app.kubernetes.io/name=security-attributes-provider"
+    tags: [ "env:authority01", "name:security-attributes-provider"]
+
+  - namespace: "authority01"
+    template: '{{ template "withJq" . }}'
+    name: "authority01/tier1-gateway"
+    labels: "app.kubernetes.io/name=tier1-gateway"
+    tags: [ "env:authority01", "name:tier1-gateway"]
+
+  - namespace: "authority01"
+    template: '{{ template "withJq" . }}'
+    name: "authority01/tier2-gateway"
+    labels: "app.kubernetes.io/name=tier2-gateway"
+    tags: [ "env:authority01", "name:tier2-gateway"]
+
+  - namespace: "authority01"
+    template: '{{ template "basicMessage" . }}'
+    name: "authority01/tier2-proxy"
+    labels: "app.kubernetes.io/name=tier2-proxy"
+    tags: [ "env:authority01", "name:tier2-proxy"]
+
+  - namespace: "authority01"
+    template: '{{ template "withJq" . }}'
+    name: "authority01/users-roles"
+    labels: "app.kubernetes.io/name=users-roles"
+    tags: [ "env:authority01", "name:users-roles"]
+
+  - namespace: "consumer01"
+    template: '{{ template "withJq" . }}'
+    name: "consumer01/authentication-provider"
+    labels: "app.kubernetes.io/name=authentication-provider"
+    tags: [ "env:consumer01", "name:authentication-provider"]
+
+  - namespace: "consumer01"
+    template: '{{ template "withJq" . }}'
+    name: "consumer01/tier1-gateway"
+    labels: "app.kubernetes.io/name=tier1-gateway"
+    tags: [ "env:consumer01", "name:tier1-gateway"]
+
+  - namespace: "consumer01"
+    template: '{{ template "withJq" . }}'
+    name: "consumer01/tier2-gateway"
+    labels: "app.kubernetes.io/name=tier2-gateway"
+    tags: [ "env:consumer01", "name:tier2-gateway"]
+
+  - namespace: "consumer01"
+    template: '{{ template "basicMessage" . }}'
+    name: "consumer01/tier2-proxy"
+    labels: "app.kubernetes.io/name=tier2-proxy"
+    tags: [ "env:consumer01", "name:tier2-proxy"]
+
+  - namespace: "consumer01"
+    template: '{{ template "withJq" . }}'
+    name: "consumer01/users-roles"
+    labels: "app.kubernetes.io/name=users-roles"
+    tags: [ "env:consumer01", "name:users-roles"]
+
+  - namespace: "dataprovider01"
+    template: '{{ template "withJq" . }}'
+    name: "dataprovider01/authentication-provider"
+    labels: "app.kubernetes.io/name=authentication-provider"
+    tags: [ "env:dataprovider01", "name:authentication-provider"]
+
+  - namespace: "dataprovider01"
+    template: '{{ template "withJq" . }}'
+    name: "dataprovider01/tier1-gateway"
+    labels: "app.kubernetes.io/name=tier1-gateway"
+    tags: [ "env:dataprovider01", "name:tier1-gateway"]
+
+  - namespace: "dataprovider01"
+    template: '{{ template "withJq" . }}'
+    name: "dataprovider01/tier2-gateway"
+    labels: "app.kubernetes.io/name=tier2-gateway"
+    tags: [ "env:dataprovider01", "name:tier2-gateway"]
+
+  - namespace: "dataprovider01"
+    template: '{{ template "basicMessage" . }}'
+    name: "dataprovider01/tier2-proxy"
+    labels: "app.kubernetes.io/name=tier2-proxy"
+    tags: [ "env:dataprovider01", "name:tier2-proxy"]
+
+  - namespace: "dataprovider01"
+    template: '{{ template "withJq" . }}'
+    name: "dataprovider01/users-roles"
+    labels: "app.kubernetes.io/name=users-roles"
+    tags: [ "env:dataprovider01", "name:users-roles"]
+
