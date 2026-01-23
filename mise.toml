@@ -62,17 +62,17 @@ curl -v -X POST "$AUTHORITY_AUTH_PROVIDER/v1/keypairs/generate"
 curl -v -X POST "$AUTHORITY_AUTH_PROVIDER/v1/csr/generate" \
 --header 'Content-Type: application/json' \
 --data-raw '{
-  "commonName": "localhost",
+  "commonName": "tls.authority.authority01.sandbox-iaa.simpl-europe.eu",
   "country": "it",
-  "organization": "test",
-  "organizationalUnit": "test"
+  "organization": "authority01",
+  "organizationalUnit": "authority01"
 }' > csr.pem
 
 >&2 echo Creating Authority participant
 PARTICIPANT_ID=$(curl -v -X POST "$AUTHORITY_IDENTITY_PROVIDER/v1/participants" \
 --header 'Content-Type: application/json' \
 --data-raw '{
-  "organization": "test",
+  "organization": "authority01",
   "participantType": "GOVERNANCE_AUTHORITY"
 }' | sed -E 's/^"(.*)"$/\\1/')
 
@@ -88,4 +88,20 @@ curl "$AUTHORITY_IDENTITY_PROVIDER/v1/credentials/$PARTICIPANT_ID/download" \
 >&2 echo Uploading credentials ...
 curl -v -H "Authorization: Bearer $TMP_TOKEN" -X POST "$AUTHORITY_AUTH_PROVIDER/v1/credentials" \
 -F "credential=@cert.pem"
+"""
+
+[tasks."cluster:secrets"]
+shell = "bash -c"
+run = """
+function main() {
+  SECRET_KEY="$1"
+  T_BAO=$(kubectl -n common01 get secret secrets-root-token -o jsonpath="{.data.token}" | base64 -d)
+  (
+  kubectl -n common01 exec -i openbao-common01-0 -- sh -b << EOF
+  >&2 bao login "$T_BAO" \
+  && bao kv get -format=json "$SECRET_KEY"
+EOF
+  ) | cat
+}
+main
 """
