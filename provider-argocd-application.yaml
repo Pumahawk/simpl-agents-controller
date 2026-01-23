@@ -25,6 +25,7 @@ spec:
         project: default
 
         namespaceTag:
+          authority: authority01
           dataprovider: dataprovider01
           common: common01
 

@@ -89,7 +89,7 @@ curl "$AUTHORITY_IDENTITY_PROVIDER/v1/credentials/$PARTICIPANT_ID/download" \
 curl -v -H "Authorization: Bearer $TMP_TOKEN" -X POST "$AUTHORITY_AUTH_PROVIDER/v1/credentials" \
 -F "credential=@cert.pem"
 """
-
+# sandbox-iaa/consumer01-postgres-passwords
 [tasks."cluster:secrets"]
 shell = "bash -c"
 run = """
@@ -105,3 +105,9 @@ EOF
 }
 main
 """
+
+[tasks."cluster:db:exec"]
+run = "kubectl exec -n common01 pg-cluster-0 -- psql -U postgres"
+
+[tasks."cluster:db:connect"]
+run = "kubectl exec -it -n common01 pg-cluster-0 -- psql -U postgres"
