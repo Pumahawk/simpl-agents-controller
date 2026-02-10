@@ -1,9 +1,12 @@
 [tools]
 kubectl = "1.34.1"
+go = "1.25.4"
+"go:github.com/pumahawk/klog" = "latest"
 
 [env]
 KUBECONFIG = "__REQUIRED_OVERRIDE__"
 AUTHORITY_NAMESPACE = "authority01"
+TIER2_FQDN="tls.authority.authority01.sandbox-iaa.simpl-europe.eu"
 
 [tasks."logs"]
 shell = "bash -c"
@@ -62,7 +65,7 @@ curl -v -X POST "$AUTHORITY_AUTH_PROVIDER/v1/keypairs/generate"
 curl -v -X POST "$AUTHORITY_AUTH_PROVIDER/v1/csr/generate" \
 --header 'Content-Type: application/json' \
 --data-raw '{
-  "commonName": "tls.authority.authority01.sandbox-iaa.simpl-europe.eu",
+  "commonName": "'"$TIER2_FQDN"'",
   "country": "it",
   "organization": "authority01",
   "organizationalUnit": "authority01"
@@ -95,11 +98,12 @@ shell = "bash -c"
 run = """
 function main() {
   SECRET_KEY="$1"
+  shift;
   T_BAO=$(kubectl -n common01 get secret secrets-root-token -o jsonpath="{.data.token}" | base64 -d)
   (
   kubectl -n common01 exec -i openbao-common01-0 -- sh -b << EOF
   >&2 bao login "$T_BAO" \
-  && bao kv get -format=json "$SECRET_KEY"
+  && bao kv get -format=json "$@" "$SECRET_KEY"
 EOF
   ) | cat
 }
@@ -111,3 +115,4 @@ run = "kubectl exec -n common01 pg-cluster-0 -- psql -U postgres"
 
 [tasks."cluster:db:connect"]
 run = "kubectl exec -it -n common01 pg-cluster-0 -- psql -U postgres"
+
