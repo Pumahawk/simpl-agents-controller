@@ -116,3 +116,125 @@ run = "kubectl exec -n common01 pg-cluster-0 -- psql -U postgres"
 [tasks."cluster:db:connect"]
 run = "kubectl exec -it -n common01 pg-cluster-0 -- psql -U postgres"
 
+[tasks."db:drop_all_tables"]
+shell = "bash -ec"
+run = """
+drop_all_tables() {
+  local K_NAMESPACE="$1"
+  local DB_USER="$2"
+
+  # --- Parameter validation ---
+  if [[ -z "$K_NAMESPACE" || -z "$DB_USER" ]]; then
+    echo "ERROR: Missing required parameters."
+    echo "Usage: drop_all_tables <namespace> <db_user>"
+    return 1
+  fi
+
+  local DB_PASS="$(mise run db:get_password "$K_NAMESPACE" "$DB_USER")"
+
+  # --- Parameter validation ---
+  if [[ -z "$DB_PASS" ]]; then
+    echo "ERROR: Missing required parameters."
+    echo "ERROR: Missing password"
+    return 1
+  fi
+
+  echo "Connecting to database as ${K_NAMESPACE}_${DB_USER}..."
+
+  kubectl exec -i -n common01 pg-cluster-0 -- sh -c "
+    export PGPASSWORD='${DB_PASS}';
+    psql --host=pg-cluster -U ${K_NAMESPACE}_${DB_USER} <<'SQL'
+DO \\$\\$
+DECLARE
+    r RECORD;
+BEGIN
+    FOR r IN (
+        SELECT tablename
+        FROM pg_tables
+        WHERE schemaname = 'public'
+    )
+    LOOP
+        EXECUTE 'DROP TABLE IF EXISTS public.'
+                || quote_ident(r.tablename)
+                || ' CASCADE';
+    END LOOP;
+END
+\\$\\$;
+SQL
+"
+
+  if [[ $? -ne 0 ]]; then
+    echo "ERROR: Failed to drop tables."
+    return 1
+  fi
+
+  echo "All tables in schema 'public' have been dropped successfully."
+}
+drop_all_tables
+"""
+
+[tasks."db:get_password"]
+shell = "bash -ec"
+run = """
+get_password() {
+  local K_NAMESPACE="$1"
+  local DB_USER="$2"
+
+  # --- Parameter validation ---
+  if [[ -z "$K_NAMESPACE" || -z "$DB_USER" ]]; then
+    echo "ERROR: Missing required parameters."
+    echo "Usage: get_password <namespace> <db_user>"
+    return 1
+  fi
+
+  mise run cluster:secrets sandbox-iaa/"$K_NAMESPACE"-postgres-passwords | jq -r '.data.data."'"${K_NAMESPACE}-${DB_USER}"'"'
+}
+get_password
+"""
+
+[tasks."db:get_secrets"]
+shell = "bash -ec"
+run = """
+get_secrets() {
+  local K_NAMESPACE="$1"
+
+  # --- Parameter validation ---
+  if [[ -z "$K_NAMESPACE" ]]; then
+    echo "ERROR: Missing required parameters."
+    echo "Usage: get_secrets <namespace>"
+    return 1
+  fi
+
+  mise run cluster:secrets sandbox-iaa/${K_NAMESPACE}-postgres-passwords
+}
+get_secrets
+"""
+
+[tasks."db:clear_agent"]
+shell = "bash -ec"
+run = """
+clear_agent() {
+  local K_NAMESPACE="$1"
+
+  # --- Parameter validation ---
+  if [[ -z "$K_NAMESPACE" ]]; then
+    echo "ERROR: Missing required parameters."
+    echo "Usage: clear_agent <namespace>"
+    return 1
+  fi
+
+   # Participant
+   mise run db:drop_all_tables "$K_NAMESPACE" authenticationprovider
+   mise run db:drop_all_tables "$K_NAMESPACE" usersroles
+
+   if echo "$K_NAMESPACE" | grep -q authority; then
+     # Authority
+     # mise run db:drop_all_tables "$K_NAMESPACE" ejbca
+     # mise run db:drop_all_tables "$K_NAMESPACE" keycloak
+     mise run db:drop_all_tables "$K_NAMESPACE" identityprovider
+     mise run db:drop_all_tables "$K_NAMESPACE" onboarding
+     mise run db:drop_all_tables "$K_NAMESPACE" securityattributesprovider
+   fi
+}
+clear_agent
+"""
