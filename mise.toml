@@ -103,7 +103,7 @@ function main() {
   (
   kubectl -n common01 exec -i openbao-common01-0 -- sh -b << EOF
   >&2 bao login "$T_BAO" \
-  && bao kv get -format=json "$@" "$SECRET_KEY"
+  && bao kv get -format=json $@ "$SECRET_KEY"
 EOF
   ) | cat
 }
