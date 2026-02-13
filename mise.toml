@@ -1,13 +1,64 @@
+# -----------------------------------------------------------------------------
+# ESCAPE-REF: KC-MISE-QUOTE-001
+#
+# This task embeds a multiline shell script inside a single-quoted string
+# passed to `bash -c` via `kubectl exec`.
+#
+# IMPORTANT:
+# The outer layer uses single quotes ('...') to prevent the local shell from
+# performing variable expansion or interpretation before the script reaches
+# the container.
+#
+# Because of this, ANY single quote character inside the embedded script
+# will terminate the outer string and break parsing.
+#
+# In shell, single quotes cannot be escaped inside single-quoted strings.
+# The only safe ways to include a single quote are:
+#
+#   1) Close and reopen the quote:
+#        'foo'\''bar'
+#
+#   2) Avoid single quotes entirely inside the embedded script.
+#
+# Why this matters:
+# The evaluation chain is:
+#     mise template expansion
+#     → local bash parsing
+#     → kubectl exec
+#     → container bash -c parsing
+#
+# The outer single quotes ensure the script is passed RAW to the container.
+# Breaking this quoting breaks the entire execution model.
+#
+# If modifying the embedded script, ensure it does not contain unescaped
+# single quotes.
+# -----------------------------------------------------------------------------
+
 [tools]
 kubectl = "1.34.1"
 go = "1.25.4"
 jq = "1.8.1"
+yq = "4.47.2"
 "go:github.com/pumahawk/klog" = "latest"
 
 [env]
 KUBECONFIG = "__REQUIRED_OVERRIDE__"
 AUTHORITY_NAMESPACE = "authority01"
 TIER2_FQDN="tls.authority.authority01.sandbox-iaa.simpl-europe.eu"
+
+# See ESCAPE-REF: KC-MISE-QUOTE-001
+[vars]
+keycloak_sh = """
+kgetpass() {
+  cat /opt/bitnami/keycloak/secrets/admin-password
+}
+kcadm() {
+  local action="${1?Missing action}"
+  shift
+  local pass="$(kgetpass)"
+  /opt/keycloak/bin/kcadm.sh "$action" --no-config --server http://keycloak --realm master --user admin --password $pass "$@"
+}
+"""
 
 [tasks."logs"]
 shell = "bash -c"
@@ -238,4 +289,82 @@ clear_agent() {
    fi
 }
 clear_agent
+"""
+
+[tasks."keycloak:cli"]
+shell = "bash -ec"
+run = """
+keycloak_cli() {
+local K_NAMESPACE="${1?"Missing namespace"}"
+kubectl -it -n "$K_NAMESPACE" exec keycloak-0 -- bash -c "
+bash --init-file <( echo -e '"'{{vars.keycloak_sh}}'"' ) -i
+"
+}
+keycloak_cli
+"""
+
+[tasks."services:info"]
+shell = "bash -ec"
+run = """
+services_endpoints() {
+  local project_name="${1?Missing project}"
+  local chart_file="simpl-repo/$project_name/charts/values.yaml"
+  [ -f "$chart_file" ] || {
+     echo "Invalid project."
+     exit 1;
+  }
+  cat "$chart_file" | yq -ojson | jq 'to_entries[] | select((.value|type)=="object" and .value.projectID!=null) | {name:.key, projectID:.value.projectID, repo:"https://code.europa.eu/api/v4/projects/\\(.value.projectID)/packages/helm/stable"}' 
+}
+services_endpoints
+"""
+
+[tasks."services:versions_by_projectID"]
+shell = "bash -ec"
+run = """
+services_versions_by_projectID() {
+  local project_id="${1?Missing project ID}"
+  curl -s "https://code.europa.eu/api/v4/projects/$project_id/packages/helm/stable/index.yaml" | yq -o json -r '.entries[] | sort_by(.created) | reverse | .[].version' 
+}
+services_versions_by_projectID
+"""
+
+[tasks."keycloak:config:eidas"]
+shell = "bash -ec"
+run = """
+keycloak_config_eidas() {
+local K_NAMESPACE="${1?"Missing namespace"}"
+kubectl -n "$K_NAMESPACE" exec keycloak-0 -- bash -c '
+{{vars.keycloak_sh}}
+'"
+kgetpass
+"
+}
+keycloak_config_eidas
+"""
+
+[tasks."services:last_version"]
+shell = "bash -ec"
+run = """
+services_last_version() {
+  local repo_name="${1?"Missing repo name"}"
+  local project_name="${2?"Missing project name"}"
+  local project_id="$(mise run services:info authority-iaa | jq -r 'select(.name == "'"$project_name"'") | .projectID')"
+  echo $project_name $(mise services:versions_by_projectID $project_id | grep -v -e latest -e \\-rc -e hotfix | head -n1)
+}
+services_last_version
+"""
+
+[tasks."services:all_last_version"]
+shell = "bash -ec"
+run = """
+services_all_last_version() {
+  local repo_name="${1?"Missing repo name"}"
+  mise run services:info $repo_name | jq -r '"\\(.name)|\\(.projectID)"' |
+  while read line; do
+    local project_name="$(echo -e $line | cut -d\\| -f1)"
+    local project_id="$(echo -e $line | cut -d\\| -f2)"
+    echo $project_name "$(mise services:versions_by_projectID $project_id | grep -v -e latest -e \\-rc -e hotfix | head -n1)"
+  done
+}
+services_all_last_version
 """
