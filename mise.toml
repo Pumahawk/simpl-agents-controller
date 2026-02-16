@@ -368,3 +368,16 @@ services_all_last_version() {
 }
 services_all_last_version
 """
+
+[tasks."yaml:argo_app:update_target_revision"]
+shell = "bash -ec"
+dir = "{{cwd}}"
+run = """
+update_target_revision() {
+  local file="${1?Missing file path}"
+  local name="${2?Missing name}"
+  local version="${3?Missing version}"
+  yq -i '(.spec.source.helm.parameters[] | select(.name | test("^'"$name"'.targetRevision")) | .value) = "'"$version"'"' "$file"
+}
+update_target_revision
+"""
