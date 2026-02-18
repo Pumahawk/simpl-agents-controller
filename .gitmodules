@@ -1,6 +1,6 @@
 [submodule "simpl-repo/authority-iaa"]
 	path = simpl-repo/authority-iaa
-	url = https://code.europa.eu/simpl/simpl-open/development/iaa/authority-iaa
+	url = https://code.europa.eu/simpl/simpl-open/development/iaa/authority-iaa.git
 [submodule "simpl-repo/consumer-iaa"]
 	path = simpl-repo/consumer-iaa
 	url = https://code.europa.eu/simpl/simpl-open/development/iaa/consumer-iaa.git
