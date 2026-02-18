@@ -314,10 +314,21 @@ services_endpoints() {
      echo "Invalid project."
      exit 1;
   }
-  cat "$chart_file" | yq -ojson | jq 'to_entries[] | select((.value|type)=="object" and .value.projectID!=null) | {name:.key, projectID:.value.projectID, repo:"https://code.europa.eu/api/v4/projects/\\(.value.projectID)/packages/helm/stable"}' 
+  cat "$chart_file" | yq -ojson | jq 'to_entries[] | select((.value|type)=="object" and .value.projectID!=null) | {name:.key, projectID:.value.projectID, version: .value.targetRevision, repo:"https://code.europa.eu/api/v4/projects/\\(.value.projectID)/packages/helm/stable"}' 
 }
 services_endpoints
 """
+
+[tasks."services:info-table"]
+shell = "bash -ec"
+run = """
+services_info_table() {
+   local project_name="${1?Missing project}"
+   mise services:info "$project_name" | jq -r '"\\(.name),\\(.version)"' | column -s, -t
+}
+services_info_table
+"""
+
 
 [tasks."services:versions_by_projectID"]
 shell = "bash -ec"
