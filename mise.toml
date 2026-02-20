@@ -436,9 +436,14 @@ function argo_update_versions() {
   done < <(echo "$YAML_TEXT" | yq .spec.source.helm.parameters[].name | sed 's/\\.targetRevision//;s/^.*\\\\.//')
   log "Diff properties"
   >&2 diff --color=always -U100 <(echo "$YAML_ORIGINAL" | yq .spec.source.helm.parameters) <(echo "$YAML_TEXT" | yq .spec.source.helm.parameters) || true
-  local YAML_DEST_FILE="$K_NAMESPACE"-argo-update-$(date '+%Y-%M-%d-%H%m%S').yaml
-  log "Save file $YAML_DEST_FILE"
-  echo "$YAML_TEXT" | tee  "$YAML_DEST_FILE" | yq .
+  local DEST_SUFFIX="-argo-update-$(date '+%Y-%M-%d-%H%m%S').yaml"
+  local YAML_DEST_FILE="${K_NAMESPACE}-updated${DEST_SUFFIX}"
+  local YAML_OLD_DEST_FILE="${K_NAMESPACE}-old${DEST_SUFFIX}"
+  log "Save updated file to $YAML_DEST_FILE"
+  echo "$YAML_TEXT" > "$YAML_DEST_FILE"
+  log "Save old file to $YAML_OLD_DEST_FILE"
+  echo "$YAML_ORIGINAL" > "$YAML_OLD_DEST_FILE"
+  echo "$YAML_TEXT" | yq .
 }
 
 function iaa_get_projectID_by_projectName() {
@@ -463,6 +468,19 @@ function log() {
   >&2 echo "$(date -Iseconds) - $1"
 }
 argo_update_versions
+"""
+
+[tasks."argo:update_and_sync_by_namespace"]
+shell = "bash -ec"
+run = """
+argo_update_and_sync() {
+local K_NAMESPACE="${1?Missing namespace}"
+shift
+local VERSION_GREP_ARGS=("$@")
+YAML_TEXT=$(mise run argo:get_updated_application_by_namespace "$K_NAMESPACE" "${VERSION_GREP_ARGS[@]}")
+kubectl apply -f <(echo "$YAML_TEXT") && mise run argo:sync "$K_NAMESPACE"
+}
+argo_update_and_sync
 """
 
 [tasks."argo:sync"]
