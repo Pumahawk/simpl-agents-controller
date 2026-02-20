@@ -499,7 +499,7 @@ shell = "bash -ec"
 run = """
 argo_sync() {
   K_NAME="${1?Missing namespace}"
-  kubectl -n argocd exec -it argo-cd-argocd-application-controller-0 -- argocd --core app sync "${K_NAME}"-deployer
+  kubectl -n argocd exec argo-cd-argocd-application-controller-0 -- argocd --core app sync "${K_NAME}"-deployer
 }
 argo_sync
 """
