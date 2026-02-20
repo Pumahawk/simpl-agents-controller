@@ -335,7 +335,7 @@ shell = "bash -ec"
 run = """
 services_versions_by_projectID() {
   local project_id="${1?Missing project ID}"
-  curl -s "https://code.europa.eu/api/v4/projects/$project_id/packages/helm/stable/index.yaml" | yq -o json -r '.entries[] | sort_by(.created) | reverse | .[].version' 
+  curl -s -w "%{stderr}Http response code: %{http_code}\\n" "https://code.europa.eu/api/v4/projects/$project_id/packages/helm/stable/index.yaml" | yq -o json -r '.entries[] | sort_by(.created) | reverse | .[].version'
 }
 services_versions_by_projectID
 """
@@ -389,7 +389,88 @@ update_target_revision() {
   local file="${1?Missing file path}"
   local name="${2?Missing name}"
   local version="${3?Missing version}"
-  yq -i '(.spec.source.helm.parameters[] | select(.name | test("^'"$name"'.targetRevision")) | .value) = "'"$version"'"' "$file"
+  yq '(.spec.source.helm.parameters[] | select(.name | test("^'"$name"'.targetRevision")) | .value) = "'"$version"'"' "$file"
 }
 update_target_revision
+"""
+
+[tasks."argo:get_updated_application_by_namespace"]
+shell = "bash -ec"
+run = """
+# Functions argo:get_updated_application_by_namespace
+function argo_getapp() {
+  local K_NAMESPACE="${1?Missing namespace}"
+  local ARGO_DEPLOYER="$K_NAMESPACE"-deployer
+  log "Get argocd deployer [$ARGO_DEPLOYER]"
+  kubectl -n argocd get -oyaml application "$ARGO_DEPLOYER" | yq .
+}
+
+function helm_get_last_version_by_project_name() {
+  local NAME="${1?Missin project name}"
+  shift
+  local VERSION_GREP_ARGS=("$@")
+  log "Get last version project $NAME"
+  local PROJECT_ID="$(iaa_get_projectID_by_projectName "${NAME}")"
+  log "Retrieved projectID name=[$NAME] id=[$PROJECT_ID]"
+  local PROJECT_VERSION="$(mise run services:versions_by_projectID $PROJECT_ID | grep "${VERSION_GREP_ARGS[@]-".*"}" | head -n1)"
+  log "Retrieved version name=[$NAME] version=[$PROJECT_VERSION]"
+  echo $PROJECT_VERSION
+}
+
+function argo_update_versions() {
+  K_NAMESPACE=${1?Missing namespace}
+  shift
+  local VERSION_GREP_ARGS=("$@")
+  local YAML_TEXT="$(argo_getapp "$K_NAMESPACE")"
+  local YAML_ORIGINAL="$YAML_TEXT"
+  local VERSION=""
+   while read line; do
+    local NAME="$line"
+    log "Update version. name=[$NAME]"
+    VERSION="$(helm_get_last_version_by_project_name "$NAME" "${VERSION_GREP_ARGS[@]}")"
+    if [[ -n "$VERSION" && "$VERSION" != "null" ]]; then
+    YAML_TEXT="$(mise run yaml:argo_app:update_target_revision  <(echo "$YAML_TEXT") "$NAME" "$VERSION")"
+    else
+      log "Invalid version retrieved. Skip update. name=[$NAME]"
+    fi
+  done < <(echo "$YAML_TEXT" | yq .spec.source.helm.parameters[].name | sed 's/\\.targetRevision//;s/^.*\\\\.//')
+  log "Diff properties"
+  >&2 diff --color=always -U100 <(echo "$YAML_ORIGINAL" | yq .spec.source.helm.parameters) <(echo "$YAML_TEXT" | yq .spec.source.helm.parameters) || true
+  local YAML_DEST_FILE="$K_NAMESPACE"-argo-update-$(date '+%Y-%M-%d-%H%m%S').yaml
+  log "Save file $YAML_DEST_FILE"
+  echo "$YAML_TEXT" | tee  "$YAML_DEST_FILE" | yq .
+}
+
+function iaa_get_projectID_by_projectName() {
+local NAME="${1?Missin project name}"
+cat << 'EOF' | grep -E "^${NAME} " | grep -o -E "[0-9]*$"
+tier1_gateway 772
+sap 861
+users_roles 771
+fe_auth_provider 1308
+fe_users_roles 1310
+fe_identity_provider 1311
+fe_onboarding 1307
+fe_security_attribute_provider 1309
+onboarding 770
+tier2_gateway 860
+identity_provider 913
+auth_provider 939
+tier2_proxy 1112
+EOF
+}
+function log() {
+  >&2 echo "$(date -Iseconds) - $1"
+}
+argo_update_versions
+"""
+
+[tasks."argo:sync"]
+shell = "bash -ec"
+run = """
+argo_sync() {
+  K_NAME="${1?Missing namespace}"
+  kubectl -n argocd exec -it argo-cd-argocd-application-controller-0 -- argocd --core app sync "${K_NAME}"-deployer
+}
+argo_sync
 """
