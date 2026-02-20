@@ -435,7 +435,13 @@ function argo_update_versions() {
     fi
   done < <(echo "$YAML_TEXT" | yq .spec.source.helm.parameters[].name | sed 's/\\.targetRevision//;s/^.*\\\\.//')
   log "Diff properties"
-  >&2 diff --color=always -U100 <(echo "$YAML_ORIGINAL" | yq .spec.source.helm.parameters) <(echo "$YAML_TEXT" | yq .spec.source.helm.parameters) || true
+  local diff_exit=0
+  set +e
+  >&2 diff --color=always -U100 \
+    <(echo "$YAML_ORIGINAL" | yq .spec.source.helm.parameters) \
+    <(echo "$YAML_TEXT" | yq .spec.source.helm.parameters)
+  diff_exit=$?
+  set -e
   local DEST_SUFFIX="-argo-update-$(date '+%Y-%M-%d-%H%m%S').yaml"
   local YAML_DEST_FILE="${K_NAMESPACE}-updated${DEST_SUFFIX}"
   local YAML_OLD_DEST_FILE="${K_NAMESPACE}-old${DEST_SUFFIX}"
@@ -444,6 +450,7 @@ function argo_update_versions() {
   log "Save old file to $YAML_OLD_DEST_FILE"
   echo "$YAML_ORIGINAL" > "$YAML_OLD_DEST_FILE"
   echo "$YAML_TEXT" | yq .
+  [ $diff_exit != 0 ]
 }
 
 function iaa_get_projectID_by_projectName() {
@@ -477,8 +484,12 @@ argo_update_and_sync() {
 local K_NAMESPACE="${1?Missing namespace}"
 shift
 local VERSION_GREP_ARGS=("$@")
-YAML_TEXT=$(mise run argo:get_updated_application_by_namespace "$K_NAMESPACE" "${VERSION_GREP_ARGS[@]}")
-kubectl apply -f <(echo "$YAML_TEXT") && mise run argo:sync "$K_NAMESPACE"
+if YAML_TEXT=$(mise run argo:get_updated_application_by_namespace "$K_NAMESPACE" "${VERSION_GREP_ARGS[@]}"); then
+  >&2 echo Apply and sync.
+  kubectl apply -f <(echo "$YAML_TEXT") && mise run argo:sync "$K_NAMESPACE"
+else
+  >&2 echo No differences . Skip apply and sync.
+fi
 }
 argo_update_and_sync
 """
@@ -491,4 +502,27 @@ argo_sync() {
   kubectl -n argocd exec -it argo-cd-argocd-application-controller-0 -- argocd --core app sync "${K_NAME}"-deployer
 }
 argo_sync
+"""
+
+[tasks."environment:remote_update"]
+shell = "bash -ec"
+run = """
+environment_remote_update() {
+  local K_NAME="${1?Missing namespace}"
+  local VERSION_GREP_ARGS=( -v -e latest )
+  case "$K_NAME" in
+    iaadsdev*)
+      VERSION_GREP_ARGS=(-P '^(?=.*SNAPSHOT)(?!.*latest).*')
+      mise run argo:update_and_sync_by_namespace "$K_NAME" "${VERSION_GREP_ARGS[@]}"
+      ;;
+    iaadsstaging*)
+      VERSION_GREP_ARGS=(-v -e SNAPSHOT -e latest)
+      mise run argo:update_and_sync_by_namespace "$K_NAME" "${VERSION_GREP_ARGS[@]}"
+    ;;
+    *)
+      echo "Unsupported automatic update for environment $K_NAME"
+    ;;
+  esac
+}
+environment_remote_update
 """
