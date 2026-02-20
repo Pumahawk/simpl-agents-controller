@@ -539,6 +539,17 @@ argo_sync() {
 argo_sync
 """
 
+[tasks."argo:sync_all"]
+run = """
+mise run \\
+    argo:sync iaadsdevauthority \\
+::: argo:sync iaadsdevconsumer \\
+::: argo:sync iaadsdevdataprovider \\
+::: argo:sync iaadsstagingauthority \\
+::: argo:sync iaadsstagingconsumer \\
+::: argo:sync iaadsstagingdataprovider
+"""
+
 [tasks."environment:remote_update"]
 shell = "bash -ec"
 run = """
@@ -560,4 +571,15 @@ environment_remote_update() {
   esac
 }
 environment_remote_update
+"""
+
+[tasks."environment:remote_update_all"]
+run = """
+mise run \\
+    environment:remote_update iaadsdevauthority \\
+::: environment:remote_update iaadsdevconsumer \\
+::: environment:remote_update iaadsdevdataprovider \\
+::: environment:remote_update iaadsstagingauthority \\
+::: environment:remote_update iaadsstagingconsumer \\
+::: environment:remote_update iaadsstagingdataprovider
 """
