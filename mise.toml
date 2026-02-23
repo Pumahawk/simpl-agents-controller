@@ -592,7 +592,10 @@ mise run \\
 ::: argo:sync iaadsdevdataprovider \\
 ::: argo:sync iaadsstagingauthority \\
 ::: argo:sync iaadsstagingconsumer \\
-::: argo:sync iaadsstagingdataprovider
+::: argo:sync iaadsstagingdataprovider \\
+::: argo:sync iaadsautomationauthority \\
+::: argo:sync iaadsautomationconsumer \\
+::: argo:sync iaadsautomationdataprovider
 """
 
 [tasks."environment:remote_update"]
@@ -626,5 +629,8 @@ mise run \\
 ::: environment:remote_update iaadsdevdataprovider \\
 ::: environment:remote_update iaadsstagingauthority \\
 ::: environment:remote_update iaadsstagingconsumer \\
-::: environment:remote_update iaadsstagingdataprovider
+::: environment:remote_update iaadsstagingdataprovider \\
+::: environment:remote_update iaadsautomationauthority \\
+::: environment:remote_update iaadsautomationconsumer \\
+::: environment:remote_update iaadsautomationdataprovider
 """
