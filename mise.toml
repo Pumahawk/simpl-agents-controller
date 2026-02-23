@@ -488,12 +488,14 @@ function argo_update_versions() {
   local YAML_TEXT="$(argo_getapp "$K_NAMESPACE")"
   local YAML_ORIGINAL="$YAML_TEXT"
   local VERSION=""
-  local CHART_PROJECT_ID="$(echo "$YAML_TEXT" | yq .spec.source.repoURL | grep -o '/[0-9][0-9]*/' | sed 's|/||g')"
-  local CHART_VERSION="$(mise run services:versions_by_type_and_projectID helm,,"$CHART_PROJECT_ID" | grep "${VERSION_GREP_ARGS[@]-".*"}" | head -n1)"
-   if [[ -n "$CHART_VERSION" && "$CHART_VERSION" != "null" ]]; then
-     YAML_TEXT="$(yq '(.spec.source.targetRevision) = "'"$CHART_VERSION"'"'  <(echo "$YAML_TEXT"))"
-   else
-     log "Invalid version retrieved. Skip update. name=[$NAME]"
+  if [[ "${SKIP_UPDATE_HEAD:-}" != "1" ]]; then
+   local CHART_PROJECT_ID="$(echo "$YAML_TEXT" | yq .spec.source.repoURL | grep -o '/[0-9][0-9]*/' | sed 's|/||g')"
+   local CHART_VERSION="$(mise run services:versions_by_type_and_projectID helm,,"$CHART_PROJECT_ID" | grep "${VERSION_GREP_ARGS[@]-".*"}" | head -n1)"
+    if [[ -n "$CHART_VERSION" && "$CHART_VERSION" != "null" ]]; then
+      YAML_TEXT="$(yq '(.spec.source.targetRevision) = "'"$CHART_VERSION"'"'  <(echo "$YAML_TEXT"))"
+    else
+      log "Invalid version retrieved. Skip update. name=[$NAME]"
+    fi
    fi
    while read line; do
     local NAME="$line"
@@ -605,7 +607,7 @@ environment_remote_update() {
   local K_NAME="${1?Missing namespace}"
   local VERSION_GREP_ARGS=( -v -e latest )
   case "$K_NAME" in
-    iaadsdev*)
+    iaadsautomation*|iaadsdev*)
       VERSION_GREP_ARGS=(-P '^(?=.*SNAPSHOT)(?!.*latest).*')
       mise run argo:update_and_sync_by_namespace "$K_NAME" "${VERSION_GREP_ARGS[@]}"
       ;;
