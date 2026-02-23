@@ -163,10 +163,42 @@ main
 """
 
 [tasks."cluster:db:exec"]
-run = "kubectl exec -n common01 pg-cluster-0 -- psql -U postgres"
+run = "kubectl exec -n common01 pg-cluster-2 -- psql -U postgres"
 
 [tasks."cluster:db:connect"]
-run = "kubectl exec -it -n common01 pg-cluster-0 -- psql -U postgres"
+run = "kubectl exec -it -n common01 pg-cluster-2 -- psql -U postgres"
+
+[tasks."cluster:db:get_connections_by_user"]
+shell = "bash -ec"
+run = """
+# Get db connections
+db_get_connections() {
+local USER="${1?Missing user}"
+mise run cluster:db:connect -- -c " SELECT 'service-$USER' as name, count(*) AS numero_connessioni FROM pg_stat_activity WHERE usename = '$USER'; "
+}
+db_get_connections
+"""
+
+[tasks."cluster:db:get_connections_all"]
+shell = "bash -ec"
+run = """
+# Get db connections
+db_get_connections() {
+kubectl exec -n common01 pg-cluster-2 -- psql -U postgres -c "
+SELECT 
+    usename AS name,
+    COUNT(*) AS numero_connessioni
+FROM 
+    pg_stat_activity
+GROUP BY 
+    usename
+ORDER BY 
+    numero_connessioni DESC;
+"
+
+}
+db_get_connections
+"""
 
 [tasks."db:drop_all_tables"]
 shell = "bash -ec"
@@ -193,7 +225,7 @@ drop_all_tables() {
 
   echo "Connecting to database as ${K_NAMESPACE}_${DB_USER}..."
 
-  kubectl exec -i -n common01 pg-cluster-0 -- sh -c "
+  kubectl exec -i -n common01 pg-cluster-2 -- sh -c "
     export PGPASSWORD='${DB_PASS}';
     psql --host=pg-cluster -U ${K_NAMESPACE}_${DB_USER} <<'SQL'
 DO \\$\\$
@@ -499,10 +531,16 @@ helm,tier1_gateway,772
 helm,sap,861
 helm,users_roles,771
 helm,fe_auth_provider,1308
+helm,authentication_provider_fe,1308
 helm,fe_users_roles,1310
 helm,fe_identity_provider,1311
 helm,fe_onboarding,1307
 helm,fe_security_attribute_provider,1309
+helm,auth_provider_fe,1308
+helm,users_roles_fe,1310
+helm,identity_provider_fe,1311
+helm,onboarding_fe,1307
+helm,security_attribute_provider_fe,1309
 helm,onboarding,770
 helm,tier2_gateway,860
 helm,identity_provider,913
@@ -572,7 +610,7 @@ environment_remote_update() {
       mise run argo:update_and_sync_by_namespace "$K_NAME" "${VERSION_GREP_ARGS[@]}"
       ;;
     iaadsstaging*)
-      VERSION_GREP_ARGS=(-v -e SNAPSHOT -e latest)
+      VERSION_GREP_ARGS=(-v -e SNAPSHOT -e latest -e feature-)
       mise run argo:update_and_sync_by_namespace "$K_NAME" "${VERSION_GREP_ARGS[@]}"
     ;;
     *)
