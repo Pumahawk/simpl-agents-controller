@@ -456,6 +456,13 @@ function argo_update_versions() {
   local YAML_TEXT="$(argo_getapp "$K_NAMESPACE")"
   local YAML_ORIGINAL="$YAML_TEXT"
   local VERSION=""
+  local CHART_PROJECT_ID="$(echo "$YAML_TEXT" | yq .spec.source.repoURL | grep -o '/[0-9][0-9]*/' | sed 's|/||g')"
+  local CHART_VERSION="$(mise run services:versions_by_type_and_projectID helm,,"$CHART_PROJECT_ID" | grep "${VERSION_GREP_ARGS[@]-".*"}" | head -n1)"
+   if [[ -n "$CHART_VERSION" && "$CHART_VERSION" != "null" ]]; then
+     YAML_TEXT="$(yq '(.spec.source.targetRevision) = "'"$CHART_VERSION"'"'  <(echo "$YAML_TEXT"))"
+   else
+     log "Invalid version retrieved. Skip update. name=[$NAME]"
+   fi
    while read line; do
     local NAME="$line"
     log "Update version. name=[$NAME]"
@@ -466,12 +473,12 @@ function argo_update_versions() {
       log "Invalid version retrieved. Skip update. name=[$NAME]"
     fi
   done < <(echo "$YAML_TEXT" | yq .spec.source.helm.parameters[].name | grep targetRevision | sed 's/\\.targetRevision//;s/^.*\\.//')
-  log "Diff properties"
+  log "Diff .spec.source"
   local diff_exit=0
   set +e
   >&2 diff --color=always -U100 \
-    <(echo "$YAML_ORIGINAL" | yq .spec.source.helm.parameters) \
-    <(echo "$YAML_TEXT" | yq .spec.source.helm.parameters)
+    <(echo "$YAML_ORIGINAL" | yq .spec.source) \
+    <(echo "$YAML_TEXT" | yq .spec.source)
   diff_exit=$?
   set -e
   local DEST_SUFFIX="-argo-update-$(date '+%Y-%M-%d-%H%m%S').yaml"
