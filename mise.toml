@@ -529,6 +529,9 @@ fi
 argo_update_and_sync
 """
 
+[tasks."argo:cli"]
+run = "kubectl -n argocd exec argo-cd-argocd-application-controller-0 -- argocd --core "
+
 [tasks."argo:sync"]
 shell = "bash -ec"
 run = """
