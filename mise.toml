@@ -39,7 +39,6 @@ kubectl = "1.34.1"
 go = "1.25.4"
 jq = "1.8.1"
 yq = "4.47.2"
-"go:github.com/pumahawk/klog" = "latest"
 
 [env]
 KUBECONFIG = "__REQUIRED_OVERRIDE__"
@@ -59,10 +58,6 @@ kcadm() {
   /opt/keycloak/bin/kcadm.sh "$action" --no-config --server http://keycloak --realm master --user admin --password $pass "$@"
 }
 """
-
-[tasks."logs"]
-shell = "bash -c"
-run = "klog --kubeconfig=\"${KUBECONFIG}\" --config klog/conf.yaml -sort"
 
 [tasks."cluster:authority-initialization"]
 shell = "bash -ec"

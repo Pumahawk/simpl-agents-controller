@@ -1,0 +1,7 @@
+[tools]
+"go:github.com/pumahawk/klog" = "latest"
+
+[tasks."logs"]
+shell = "bash -c"
+run = "klog --kubeconfig=\"${KUBECONFIG}\" --config klog/conf.yaml -sort"
+
