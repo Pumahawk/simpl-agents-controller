@@ -680,3 +680,27 @@ mise run \\
 ::: environment:remote_update iaadstestconsumer \\
 ::: environment:remote_update iaadstestdataprovider \\
 """
+
+[tasks."repository:write_targetRevision_to_values"]
+dir = "{{cwd}}"
+shell = "bash -ec"
+run = """
+repository_write_targetRevision_to_values() {
+  local K_NAMESPACE="${1?Missing namespace}"
+  local VALUE_FILE="${2?Missing value file}"
+  shift; shift;
+  if [ -f "${VALUE_FILE}" ]; then
+    local Y_CONTENT="$(yq "$VALUE_FILE")"
+    local Y_CONTENT_NEW="$Y_CONTENT"
+    local Y_CONTENT_NEW="$(kubectl -n argocd get application "${K_NAMESPACE}"-deployer -oyaml | yq '.spec.source.helm.parameters[] | select(.name | test("targetRevision")) | "(.\\(.name)) = \\"\\(.value)\\""' | ( while read line; do Y_CONTENT_NEW="$(echo "$Y_CONTENT_NEW" | yq "$line")"; done; echo "$Y_CONTENT_NEW";))"
+    set +e
+    diff --color=always -u <(echo "$Y_CONTENT") <(echo "$Y_CONTENT_NEW")
+    set -e
+    echo "$Y_CONTENT_NEW" > $VALUE_FILE;
+  else
+    >&2 echo "File does not exist. file=[${VALUE_FILE}]"
+    return 1
+  fi
+}
+repository_write_targetRevision_to_values
+"""
