@@ -672,3 +672,11 @@ mise run \\
 ::: environment:remote_update iaadsautomationconsumer \\
 ::: environment:remote_update iaadsautomationdataprovider
 """
+
+[tasks."environment:remote_update_tests"]
+run = """
+mise run \\
+    environment:remote_update iaadstestauthority \\
+::: environment:remote_update iaadstestconsumer \\
+::: environment:remote_update iaadstestdataprovider \\
+"""
