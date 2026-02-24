@@ -595,6 +595,44 @@ mise run \\
 ::: argo:sync iaadsautomationdataprovider
 """
 
+[tasks."argo:copy_parameters"]
+shell = "bash -ec"
+run = """
+argo_copy_parameters() {
+  local K_NAMESPACE_FROM="${1?Missing namespace from}"
+  local K_NAMESPACE_TO="${2?Missing namespace to}"
+  Y1="$(kubectl -n argocd get application ${K_NAMESPACE_FROM}-deployer -oyaml | yq 'del(.status)')"
+  Y2="$(kubectl -n argocd get application ${K_NAMESPACE_TO}-deployer -oyaml | yq 'del(.status)')"
+  if [[ -z "$Y1" || "$Y1" == "null" ]]; then
+    >&2 echo "Application ${K_NAMESPACE_FROM}-deployer not found or invalid"
+    exit 1
+  fi
+
+  if [[ -z "$Y2" || "$Y2" == "null" ]]; then
+    >&2 echo "Application ${K_NAMESPACE_TO}-deployer not found or invalid"
+    exit 1
+  fi
+  Y3="$(echo "$Y2" | yq '(.spec.source.targetRevision) = "'"$(echo "$Y1" | yq .spec.source.targetRevision)"'" | (.spec.source.helm.parameters) = '"$(echo "$Y1" | yq -ojson .spec.source.helm.parameters)")"
+  set +e
+  >&2 echo "Changes:"
+  diff --color=always -U100 <( echo "$Y2" ) <( echo "$Y3" )
+  local diff_ret_code="$?"
+  set -e
+
+  if [ "$diff_ret_code" -eq 1 ]; then
+    >&2 echo "Changes detected, applying..."
+    >&2 echo "$Y3" | kubectl apply -f -
+  elif [ "$diff_ret_code" -eq 2 ]; then
+    >&2 echo "Diff error!" >&2
+    exit 1
+  else
+    >&2 echo "No changes detected"
+    exit 2
+  fi
+}
+argo_copy_parameters
+"""
+
 [tasks."environment:remote_update"]
 shell = "bash -ec"
 run = """
@@ -602,10 +640,13 @@ environment_remote_update() {
   local K_NAME="${1?Missing namespace}"
   local VERSION_GREP_ARGS=( -v -e latest )
   case "$K_NAME" in
-    iaadstest*|iaadsautomation*|iaadsdev*)
+    iaadsautomation*|iaadsdev*)
       VERSION_GREP_ARGS=(-P '^(?=.*SNAPSHOT)(?!.*latest).*')
       mise run argo:update_and_sync_by_namespace "$K_NAME" "${VERSION_GREP_ARGS[@]}"
       ;;
+    iaadstest*)
+      mise run argo:copy_parameters "${K_NAME/test/dev}" "$K_NAME" && mise run argo:sync "$K_NAME"
+    ;;
     iaadsstaging*)
       VERSION_GREP_ARGS=(-v -e SNAPSHOT -e latest -e feature-)
       mise run argo:update_and_sync_by_namespace "$K_NAME" "${VERSION_GREP_ARGS[@]}"
@@ -627,9 +668,6 @@ mise run \\
 ::: environment:remote_update iaadsstagingauthority \\
 ::: environment:remote_update iaadsstagingconsumer \\
 ::: environment:remote_update iaadsstagingdataprovider \\
-::: environment:remote_update iaadstestauthority \\
-::: environment:remote_update iaadstestconsumer \\
-::: environment:remote_update iaadstestdataprovider \\
 ::: environment:remote_update iaadsautomationauthority \\
 ::: environment:remote_update iaadsautomationconsumer \\
 ::: environment:remote_update iaadsautomationdataprovider
