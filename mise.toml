@@ -621,7 +621,7 @@ argo_copy_parameters() {
 
   if [ "$diff_ret_code" -eq 1 ]; then
     >&2 echo "Changes detected, applying..."
-    >&2 echo "$Y3" | kubectl apply -f -
+    echo "$Y3" | kubectl apply -f -
   elif [ "$diff_ret_code" -eq 2 ]; then
     >&2 echo "Diff error!" >&2
     exit 1
