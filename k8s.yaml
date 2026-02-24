@@ -71,6 +71,7 @@ spec:
               echo "Starting loop..."
               while true; do
                 mise run environment:remote_update_all
+                mise run argo:sync_all
                 sleep 300
               done
           resources:
