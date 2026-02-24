@@ -511,13 +511,6 @@ function argo_update_versions() {
     <(echo "$YAML_TEXT" | yq .spec.source)
   diff_exit=$?
   set -e
-  local DEST_SUFFIX="-argo-update-$(date '+%Y-%M-%d-%H%m%S').yaml"
-  local YAML_DEST_FILE="${K_NAMESPACE}-updated${DEST_SUFFIX}"
-  local YAML_OLD_DEST_FILE="${K_NAMESPACE}-old${DEST_SUFFIX}"
-  log "Save updated file to $YAML_DEST_FILE"
-  echo "$YAML_TEXT" > "$YAML_DEST_FILE"
-  log "Save old file to $YAML_OLD_DEST_FILE"
-  echo "$YAML_ORIGINAL" > "$YAML_OLD_DEST_FILE"
   echo "$YAML_TEXT" | yq .
   [ $diff_exit != 0 ]
 }
