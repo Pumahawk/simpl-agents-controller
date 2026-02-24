@@ -1,4 +1,5 @@
 [tools]
+go = "1.25.4"
 "go:github.com/pumahawk/klog" = "latest"
 
 [tasks."logs"]
