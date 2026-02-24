@@ -590,6 +590,9 @@ mise run \\
     argo:sync iaadsdevauthority \\
 ::: argo:sync iaadsdevconsumer \\
 ::: argo:sync iaadsdevdataprovider \\
+::: argo:sync iaadstestauthority \\
+::: argo:sync iaadstestconsumer \\
+::: argo:sync iaadstestdataprovider \\
 ::: argo:sync iaadsstagingauthority \\
 ::: argo:sync iaadsstagingconsumer \\
 ::: argo:sync iaadsstagingdataprovider \\
@@ -605,7 +608,7 @@ environment_remote_update() {
   local K_NAME="${1?Missing namespace}"
   local VERSION_GREP_ARGS=( -v -e latest )
   case "$K_NAME" in
-    iaadsautomation*|iaadsdev*)
+    iaadstest*|iaadsautomation*|iaadsdev*)
       VERSION_GREP_ARGS=(-P '^(?=.*SNAPSHOT)(?!.*latest).*')
       mise run argo:update_and_sync_by_namespace "$K_NAME" "${VERSION_GREP_ARGS[@]}"
       ;;
@@ -630,6 +633,9 @@ mise run \\
 ::: environment:remote_update iaadsstagingauthority \\
 ::: environment:remote_update iaadsstagingconsumer \\
 ::: environment:remote_update iaadsstagingdataprovider \\
+::: environment:remote_update iaadstestauthority \\
+::: environment:remote_update iaadstestconsumer \\
+::: environment:remote_update iaadstestdataprovider \\
 ::: environment:remote_update iaadsautomationauthority \\
 ::: environment:remote_update iaadsautomationconsumer \\
 ::: environment:remote_update iaadsautomationdataprovider
