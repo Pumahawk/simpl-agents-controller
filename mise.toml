@@ -477,7 +477,8 @@ function helm_get_last_version_by_project_name() {
 }
 
 function argo_update_versions() {
-  K_NAMESPACE=${1?Missing namespace}
+  K_NAMESPACE="${1?Missing namespace}"
+  export LOG_CONTEXT="$K_NAMESPACE"
   shift
   local VERSION_GREP_ARGS=("$@")
   local YAML_TEXT="$(argo_getapp "$K_NAMESPACE")"
@@ -549,7 +550,7 @@ EOF
 }
 
 function log() {
-  >&2 echo "$(date -Iseconds) - $1"
+  >&2 echo "$(date -Iseconds) "[${LOG_CONTEXT-"none"}]" -- $1"
 }
 argo_update_versions
 """
