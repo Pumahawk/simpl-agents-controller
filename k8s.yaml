@@ -67,6 +67,7 @@ spec:
               echo "Running mise install..."
               mise trust
               mise install
+              set +e
 
               echo "Starting loop..."
               while true; do
