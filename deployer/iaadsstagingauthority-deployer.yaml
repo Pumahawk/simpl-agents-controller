@@ -1,0 +1,121 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  creationTimestamp: "2026-02-11T13:58:15Z"
+  generation: 5420
+  name: iaadsstagingauthority-deployer
+  namespace: argocd
+  resourceVersion: "8183505753"
+  uid: 8982e531-aa48-4c75-abb0-3ec9d3e88d3c
+spec:
+  destination:
+    namespace: iaadsstagingauthority
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: authority-iaa
+    helm:
+      parameters:
+        - name: keycloak.resources.requests.memory
+          value: 1Gi
+        - name: keycloak.resources.requests.cpu
+          value: 500m
+        - name: keycloak.resources.limits.memory
+          value: 2Gi
+        - name: keycloak.resources.limits.cpu
+          value: "1"
+        - name: tier1_gateway.targetRevision
+          value: 2.11.0
+        - name: sap.targetRevision
+          value: 2.11.0
+        - name: users_roles.targetRevision
+          value: 2.11.1
+        - name: fe_auth_provider.targetRevision
+          value: 2.9.0
+        - name: fe_users_roles.targetRevision
+          value: 2.11.0
+        - name: fe_identity_provider.targetRevision
+          value: 2.9.1
+        - name: fe_onboarding.targetRevision
+          value: 2.11.2-307.hotfix.94e2e812
+        - name: fe_security_attribute_provider.targetRevision
+          value: 2.9.0
+        - name: onboarding.targetRevision
+          value: 2.11.2-2295.hotfix.7d886d09
+        - name: tier2_gateway.targetRevision
+          value: 2.10.0
+        - name: identity_provider.targetRevision
+          value: 2.10.0
+        - name: auth_provider.targetRevision
+          value: 2.11.0
+        - name: tier2_proxy.targetRevision
+          value: 1.4.0
+        - name: keycloak.keycloak_authenticator.targetRevision
+          value: 2.6.2
+        - name: keycloak.eidas_demo_keycloak_extension.targetRevision
+          value: 0.3.0
+        - name: tier1_gateway.resources.requests.cpu
+          value: 100m
+        - name: sap.resources.requests.cpu
+          value: 100m
+        - name: users_roles.resources.requests.cpu
+          value: 100m
+        - name: onboarding.resources.requests.cpu
+          value: 100m
+        - name: tier2_gateway.resources.requests.cpu
+          value: 100m
+        - name: identity_provider.resources.requests.cpu
+          value: 100m
+        - name: auth_provider.resources.requests.cpu
+          value: 100m
+        - name: tier2_proxy.resources.requests.cpu
+          value: 100m
+        - name: backendExtraGlobalDatasource
+          value: |
+            hikari:
+              maximum-pool-size: 3
+        - name: fe_auth_provider.resources.requests.cpu
+          value: 100m
+        - name: fe_users_roles.resources.requests.cpu
+          value: 100m
+        - name: fe_identity_provider.resources.requests.cpu
+          value: 100m
+        - name: fe_onboarding.resources.requests.cpu
+          value: 100m
+        - name: fe_security_attribute_provider.resources.requests.cpu
+          value: 100m
+        - name: auth_provider_fe.resources.requests.cpu
+          value: 100m
+        - name: users_roles_fe.resources.requests.cpu
+          value: 100m
+        - name: authentication_provider_fe.resources.requests.cpu
+          value: 100m
+      values: |
+        values:
+          branch: main
+
+        project: default
+
+        namespaceTag:
+          authority: iaadsstagingauthority
+          common: common01
+
+        domainSuffix: sandbox-iaa.simpl-europe.eu
+
+        resourcePreset: default
+
+        argocd:
+          appname: iaadsstagingauthority
+          namespace: argocd
+
+        cluster:
+          address: https://kubernetes.default.svc
+          namespace: iaadsstagingauthority
+          commonToolsNamespace: common01
+          issuer: dev-prod-http
+
+        secrets:
+          role: sandbox-iaa-role
+          secretEngine: sandbox-iaa
+    repoURL: https://code.europa.eu/api/v4/projects/1402/packages/helm/stable
+    targetRevision: 1.1.3-137.hotfix.d9412152
