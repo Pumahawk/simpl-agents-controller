@@ -405,18 +405,63 @@ services_helm_versions_by_projectID() {
 services_helm_versions_by_projectID
 """
 
-[tasks."keycloak:config:eidas"]
+[tasks."keycloak:config:eidas_fe"]
 shell = "bash -ec"
 run = """
-keycloak_config_eidas() {
-local K_NAMESPACE="${1?"Missing namespace"}"
-kubectl -n "$K_NAMESPACE" exec keycloak-0 -- bash -c '
-{{vars.keycloak_sh}}
-'"
-kgetpass
-"
+keycloak_config_eidas_fe() {
+local K_NAMESPACE="${1?Missing namespace}"
+local CLIENT_ID="$(mise run keycloak:cli "$K_NAMESPACE" <<<"kcadm get realms/authority/clients -q clientId=frontend-cli" | yq -r -pjson '.[] | select(.clientId == "frontend-cli") | .id')"
+
+mise run keycloak:cli "$K_NAMESPACE" <<KCLI_EOF
+kcadm create realms/authority/client-scopes -f - <<EOF
+{
+    "id": "527329d0-ff88-4776-a6d3-12cca0ed5145",
+    "name": "onboarding",
+    "description": "",
+    "protocol": "openid-connect",
+    "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "true",
+        "gui.order": "",
+        "consent.screen.text": "",
+        "include.in.openid.provider.metadata": "true"
+    },
+    "protocolMappers": [
+        {
+            "id": "60dc0e7b-fe5a-4335-b24c-5beecc06bd97",
+            "name": "Hardcoded Role",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-hardcoded-role-mapper",
+            "consentRequired": false,
+            "config": {
+                "role": "APPLICANT"
+            }
+        },
+        {
+            "id": "0202e9a2-0d66-41c4-a495-b818140cdb76",
+            "name": "User Realm Role",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-realm-role-mapper",
+            "consentRequired": false,
+            "config": {
+                "introspection.token.claim": "true",
+                "multivalued": "true",
+                "userinfo.token.claim": "true",
+                "id.token.claim": "true",
+                "lightweight.claim": "false",
+                "access.token.claim": "true",
+                "claim.name": "client-roles",
+                "jsonType.label": "String"
+            }
+        }
+    ]
 }
-keycloak_config_eidas
+EOF
+KCLI_EOF
+
+mise run keycloak:cli "$K_NAMESPACE" <<<"kcadm update realms/authority/clients/$CLIENT_ID/optional-client-scopes/527329d0-ff88-4776-a6d3-12cca0ed5145"
+}
+keycloak_config_eidas_fe
 """
 
 [tasks."services:last_version"]
