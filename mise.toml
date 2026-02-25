@@ -703,3 +703,11 @@ repository_write_targetRevision_to_values() {
 }
 repository_write_targetRevision_to_values
 """
+
+[tasks."repository:write_targetRevision_to_all_charts"]
+shell = "bash -ec"
+run = """
+mise run repository:write_targetRevision_to_values iaadsstagingauthority simpl-repo/authority-iaa/charts/values.yaml
+mise run repository:write_targetRevision_to_values iaadsstagingconsumer simpl-repo/consumer-iaa/charts/values.yaml
+mise run repository:write_targetRevision_to_values iaadsstagingdataprovider simpl-repo/provider-iaa/charts/values.yaml
+"""
