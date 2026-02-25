@@ -58,10 +58,15 @@ kcadm() {
 }
 """
 
-[tasks."cluster:authority-initialization"]
+[tasks."cluster:authority_initialization_by_namespace"]
 shell = "bash -ec"
 run = """
-NAMESPACE="${AUTHORITY_NAMESPACE}"
+cluster_authority_initialization_by_namespace() {
+local K_NAMESPACE="${1?Missing namespace}"
+if [[ ! "$K_NAMESPACE" =~ authority ]]; then
+  >&2 echo "Namespace must be an authority"
+  return 1
+fi
 
 AUTH_PF_PORT=8105
 ID_PF_PORT=8103
@@ -78,11 +83,11 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 >&2 echo "Starting port-forward for $AUTH_SERVICE..."
-kubectl port-forward -n "$NAMESPACE" svc/$AUTH_SERVICE $AUTH_PF_PORT:8080 >/tmp/auth-pf.log 2>&1 &
+kubectl port-forward -n "$K_NAMESPACE" svc/$AUTH_SERVICE $AUTH_PF_PORT:8080 >/tmp/auth-pf.log 2>&1 &
 AUTH_PF_PID=$!
 
 >&2 echo "Starting port-forward for $ID_SERVICE..."
-kubectl port-forward -n "$NAMESPACE" svc/$ID_SERVICE $ID_PF_PORT:8080 >/tmp/id-pf.log 2>&1 &
+kubectl port-forward -n "$K_NAMESPACE" svc/$ID_SERVICE $ID_PF_PORT:8080 >/tmp/id-pf.log 2>&1 &
 ID_PF_PID=$!
 
 wait_for_port() {
@@ -94,7 +99,7 @@ wait_for_port() {
     sleep 0.5
   done
   >&2 echo "Port $port not available"
-  exit 1
+  return 1
 }
 
 >&2 echo "Waiting for port-forwards to be ready..."
@@ -137,6 +142,8 @@ curl "$AUTHORITY_IDENTITY_PROVIDER/v1/credentials/$PARTICIPANT_ID/download" \
 >&2 echo Uploading credentials ...
 curl -v -H "Authorization: Bearer $TMP_TOKEN" -X POST "$AUTHORITY_AUTH_PROVIDER/v1/credentials" \
 -F "credential=@cert.pem"
+}
+cluster_authority_initialization_by_namespace
 """
 # sandbox-iaa/consumer01-postgres-passwords
 [tasks."cluster:secrets"]
