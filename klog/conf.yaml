@@ -126,3 +126,435 @@ logs:
     labels: "app.kubernetes.io/name=users-roles"
     tags: [ "env:dataprovider01", "name:users-roles"]
 
+  - namespace: "iaadsautomationauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsautomationauthority/authentication-provider"
+    labels: "app.kubernetes.io/name=authentication-provider"
+    tags: [ "env:iaadsautomationauthority", "name:authentication-provider"]
+
+  - namespace: "iaadsautomationauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsautomationauthority/identity-provider"
+    labels: "app.kubernetes.io/name=identity-provider"
+    tags: [ "env:iaadsautomationauthority", "name:identity-provider"]
+
+  - namespace: "iaadsautomationauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsautomationauthority/onboarding"
+    labels: "app.kubernetes.io/name=onboarding"
+    tags: [ "env:iaadsautomationauthority", "name:onboarding"]
+
+  - namespace: "iaadsautomationauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsautomationauthority/security-attributes-provider"
+    labels: "app.kubernetes.io/name=security-attributes-provider"
+    tags: [ "env:iaadsautomationauthority", "name:security-attributes-provider"]
+
+  - namespace: "iaadsautomationauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsautomationauthority/tier1-gateway"
+    labels: "app.kubernetes.io/name=tier1-gateway"
+    tags: [ "env:iaadsautomationauthority", "name:tier1-gateway"]
+
+  - namespace: "iaadsautomationauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsautomationauthority/tier2-gateway"
+    labels: "app.kubernetes.io/name=tier2-gateway"
+    tags: [ "env:iaadsautomationauthority", "name:tier2-gateway"]
+
+  - namespace: "iaadsautomationauthority"
+    template: '{{ template "basicMessage" . }}'
+    name: "iaadsautomationauthority/tier2-proxy"
+    labels: "app.kubernetes.io/name=tier2-proxy"
+    tags: [ "env:iaadsautomationauthority", "name:tier2-proxy"]
+
+  - namespace: "iaadsautomationauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsautomationauthority/users-roles"
+    labels: "app.kubernetes.io/name=users-roles"
+    tags: [ "env:iaadsautomationauthority", "name:users-roles"]
+
+  - namespace: "iaadsdevauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsdevauthority/authentication-provider"
+    labels: "app.kubernetes.io/name=authentication-provider"
+    tags: [ "env:iaadsdevauthority", "name:authentication-provider"]
+
+  - namespace: "iaadsdevauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsdevauthority/identity-provider"
+    labels: "app.kubernetes.io/name=identity-provider"
+    tags: [ "env:iaadsdevauthority", "name:identity-provider"]
+
+  - namespace: "iaadsdevauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsdevauthority/onboarding"
+    labels: "app.kubernetes.io/name=onboarding"
+    tags: [ "env:iaadsdevauthority", "name:onboarding"]
+
+  - namespace: "iaadsdevauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsdevauthority/security-attributes-provider"
+    labels: "app.kubernetes.io/name=security-attributes-provider"
+    tags: [ "env:iaadsdevauthority", "name:security-attributes-provider"]
+
+  - namespace: "iaadsdevauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsdevauthority/tier1-gateway"
+    labels: "app.kubernetes.io/name=tier1-gateway"
+    tags: [ "env:iaadsdevauthority", "name:tier1-gateway"]
+
+  - namespace: "iaadsdevauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsdevauthority/tier2-gateway"
+    labels: "app.kubernetes.io/name=tier2-gateway"
+    tags: [ "env:iaadsdevauthority", "name:tier2-gateway"]
+
+  - namespace: "iaadsdevauthority"
+    template: '{{ template "basicMessage" . }}'
+    name: "iaadsdevauthority/tier2-proxy"
+    labels: "app.kubernetes.io/name=tier2-proxy"
+    tags: [ "env:iaadsdevauthority", "name:tier2-proxy"]
+
+  - namespace: "iaadsdevauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsdevauthority/users-roles"
+    labels: "app.kubernetes.io/name=users-roles"
+    tags: [ "env:iaadsdevauthority", "name:users-roles"]
+
+  - namespace: "iaadsstagingauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsstagingauthority/authentication-provider"
+    labels: "app.kubernetes.io/name=authentication-provider"
+    tags: [ "env:iaadsstagingauthority", "name:authentication-provider"]
+
+  - namespace: "iaadsstagingauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsstagingauthority/identity-provider"
+    labels: "app.kubernetes.io/name=identity-provider"
+    tags: [ "env:iaadsstagingauthority", "name:identity-provider"]
+
+  - namespace: "iaadsstagingauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsstagingauthority/onboarding"
+    labels: "app.kubernetes.io/name=onboarding"
+    tags: [ "env:iaadsstagingauthority", "name:onboarding"]
+
+  - namespace: "iaadsstagingauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsstagingauthority/security-attributes-provider"
+    labels: "app.kubernetes.io/name=security-attributes-provider"
+    tags: [ "env:iaadsstagingauthority", "name:security-attributes-provider"]
+
+  - namespace: "iaadsstagingauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsstagingauthority/tier1-gateway"
+    labels: "app.kubernetes.io/name=tier1-gateway"
+    tags: [ "env:iaadsstagingauthority", "name:tier1-gateway"]
+
+  - namespace: "iaadsstagingauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsstagingauthority/tier2-gateway"
+    labels: "app.kubernetes.io/name=tier2-gateway"
+    tags: [ "env:iaadsstagingauthority", "name:tier2-gateway"]
+
+  - namespace: "iaadsstagingauthority"
+    template: '{{ template "basicMessage" . }}'
+    name: "iaadsstagingauthority/tier2-proxy"
+    labels: "app.kubernetes.io/name=tier2-proxy"
+    tags: [ "env:iaadsstagingauthority", "name:tier2-proxy"]
+
+  - namespace: "iaadsstagingauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsstagingauthority/users-roles"
+    labels: "app.kubernetes.io/name=users-roles"
+    tags: [ "env:iaadsstagingauthority", "name:users-roles"]
+
+  - namespace: "iaadstestauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadstestauthority/authentication-provider"
+    labels: "app.kubernetes.io/name=authentication-provider"
+    tags: [ "env:iaadstestauthority", "name:authentication-provider"]
+
+  - namespace: "iaadstestauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadstestauthority/identity-provider"
+    labels: "app.kubernetes.io/name=identity-provider"
+    tags: [ "env:iaadstestauthority", "name:identity-provider"]
+
+  - namespace: "iaadstestauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadstestauthority/onboarding"
+    labels: "app.kubernetes.io/name=onboarding"
+    tags: [ "env:iaadstestauthority", "name:onboarding"]
+
+  - namespace: "iaadstestauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadstestauthority/security-attributes-provider"
+    labels: "app.kubernetes.io/name=security-attributes-provider"
+    tags: [ "env:iaadstestauthority", "name:security-attributes-provider"]
+
+  - namespace: "iaadstestauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadstestauthority/tier1-gateway"
+    labels: "app.kubernetes.io/name=tier1-gateway"
+    tags: [ "env:iaadstestauthority", "name:tier1-gateway"]
+
+  - namespace: "iaadstestauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadstestauthority/tier2-gateway"
+    labels: "app.kubernetes.io/name=tier2-gateway"
+    tags: [ "env:iaadstestauthority", "name:tier2-gateway"]
+
+  - namespace: "iaadstestauthority"
+    template: '{{ template "basicMessage" . }}'
+    name: "iaadstestauthority/tier2-proxy"
+    labels: "app.kubernetes.io/name=tier2-proxy"
+    tags: [ "env:iaadstestauthority", "name:tier2-proxy"]
+
+  - namespace: "iaadstestauthority"
+    template: '{{ template "withJq" . }}'
+    name: "iaadstestauthority/users-roles"
+    labels: "app.kubernetes.io/name=users-roles"
+    tags: [ "env:iaadstestauthority", "name:users-roles"]
+
+  - namespace: "iaadsautomationdataprovider"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsautomationdataprovider/authentication-provider"
+    labels: "app.kubernetes.io/name=authentication-provider"
+    tags: [ "env:iaadsautomationdataprovider", "name:authentication-provider"]
+
+  - namespace: "iaadsautomationdataprovider"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsautomationdataprovider/tier1-gateway"
+    labels: "app.kubernetes.io/name=tier1-gateway"
+    tags: [ "env:iaadsautomationdataprovider", "name:tier1-gateway"]
+
+  - namespace: "iaadsautomationdataprovider"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsautomationdataprovider/tier2-gateway"
+    labels: "app.kubernetes.io/name=tier2-gateway"
+    tags: [ "env:iaadsautomationdataprovider", "name:tier2-gateway"]
+
+  - namespace: "iaadsautomationdataprovider"
+    template: '{{ template "basicMessage" . }}'
+    name: "iaadsautomationdataprovider/tier2-proxy"
+    labels: "app.kubernetes.io/name=tier2-proxy"
+    tags: [ "env:iaadsautomationdataprovider", "name:tier2-proxy"]
+
+  - namespace: "iaadsautomationdataprovider"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsautomationdataprovider/users-roles"
+    labels: "app.kubernetes.io/name=users-roles"
+    tags: [ "env:iaadsautomationdataprovider", "name:users-roles"]
+
+  - namespace: "iaadsdevdataprovider"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsdevdataprovider/authentication-provider"
+    labels: "app.kubernetes.io/name=authentication-provider"
+    tags: [ "env:iaadsdevdataprovider", "name:authentication-provider"]
+
+  - namespace: "iaadsdevdataprovider"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsdevdataprovider/tier1-gateway"
+    labels: "app.kubernetes.io/name=tier1-gateway"
+    tags: [ "env:iaadsdevdataprovider", "name:tier1-gateway"]
+
+  - namespace: "iaadsdevdataprovider"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsdevdataprovider/tier2-gateway"
+    labels: "app.kubernetes.io/name=tier2-gateway"
+    tags: [ "env:iaadsdevdataprovider", "name:tier2-gateway"]
+
+  - namespace: "iaadsdevdataprovider"
+    template: '{{ template "basicMessage" . }}'
+    name: "iaadsdevdataprovider/tier2-proxy"
+    labels: "app.kubernetes.io/name=tier2-proxy"
+    tags: [ "env:iaadsdevdataprovider", "name:tier2-proxy"]
+
+  - namespace: "iaadsdevdataprovider"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsdevdataprovider/users-roles"
+    labels: "app.kubernetes.io/name=users-roles"
+    tags: [ "env:iaadsdevdataprovider", "name:users-roles"]
+
+  - namespace: "iaadsstagingdataprovider"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsstagingdataprovider/authentication-provider"
+    labels: "app.kubernetes.io/name=authentication-provider"
+    tags: [ "env:iaadsstagingdataprovider", "name:authentication-provider"]
+
+  - namespace: "iaadsstagingdataprovider"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsstagingdataprovider/tier1-gateway"
+    labels: "app.kubernetes.io/name=tier1-gateway"
+    tags: [ "env:iaadsstagingdataprovider", "name:tier1-gateway"]
+
+  - namespace: "iaadsstagingdataprovider"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsstagingdataprovider/tier2-gateway"
+    labels: "app.kubernetes.io/name=tier2-gateway"
+    tags: [ "env:iaadsstagingdataprovider", "name:tier2-gateway"]
+
+  - namespace: "iaadsstagingdataprovider"
+    template: '{{ template "basicMessage" . }}'
+    name: "iaadsstagingdataprovider/tier2-proxy"
+    labels: "app.kubernetes.io/name=tier2-proxy"
+    tags: [ "env:iaadsstagingdataprovider", "name:tier2-proxy"]
+
+  - namespace: "iaadsstagingdataprovider"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsstagingdataprovider/users-roles"
+    labels: "app.kubernetes.io/name=users-roles"
+    tags: [ "env:iaadsstagingdataprovider", "name:users-roles"]
+
+  - namespace: "iaadstestdataprovider"
+    template: '{{ template "withJq" . }}'
+    name: "iaadstestdataprovider/authentication-provider"
+    labels: "app.kubernetes.io/name=authentication-provider"
+    tags: [ "env:iaadstestdataprovider", "name:authentication-provider"]
+
+  - namespace: "iaadstestdataprovider"
+    template: '{{ template "withJq" . }}'
+    name: "iaadstestdataprovider/tier1-gateway"
+    labels: "app.kubernetes.io/name=tier1-gateway"
+    tags: [ "env:iaadstestdataprovider", "name:tier1-gateway"]
+
+  - namespace: "iaadstestdataprovider"
+    template: '{{ template "withJq" . }}'
+    name: "iaadstestdataprovider/tier2-gateway"
+    labels: "app.kubernetes.io/name=tier2-gateway"
+    tags: [ "env:iaadstestdataprovider", "name:tier2-gateway"]
+
+  - namespace: "iaadstestdataprovider"
+    template: '{{ template "basicMessage" . }}'
+    name: "iaadstestdataprovider/tier2-proxy"
+    labels: "app.kubernetes.io/name=tier2-proxy"
+    tags: [ "env:iaadstestdataprovider", "name:tier2-proxy"]
+
+  - namespace: "iaadstestdataprovider"
+    template: '{{ template "withJq" . }}'
+    name: "iaadstestdataprovider/users-roles"
+    labels: "app.kubernetes.io/name=users-roles"
+    tags: [ "env:iaadstestdataprovider", "name:users-roles"]
+
+  - namespace: "iaadsautomationconsumer"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsautomationconsumer/authentication-provider"
+    labels: "app.kubernetes.io/name=authentication-provider"
+    tags: [ "env:iaadsautomationconsumer", "name:authentication-provider"]
+
+  - namespace: "iaadsautomationconsumer"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsautomationconsumer/tier1-gateway"
+    labels: "app.kubernetes.io/name=tier1-gateway"
+    tags: [ "env:iaadsautomationconsumer", "name:tier1-gateway"]
+
+  - namespace: "iaadsautomationconsumer"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsautomationconsumer/tier2-gateway"
+    labels: "app.kubernetes.io/name=tier2-gateway"
+    tags: [ "env:iaadsautomationconsumer", "name:tier2-gateway"]
+
+  - namespace: "iaadsautomationconsumer"
+    template: '{{ template "basicMessage" . }}'
+    name: "iaadsautomationconsumer/tier2-proxy"
+    labels: "app.kubernetes.io/name=tier2-proxy"
+    tags: [ "env:iaadsautomationconsumer", "name:tier2-proxy"]
+
+  - namespace: "iaadsautomationconsumer"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsautomationconsumer/users-roles"
+    labels: "app.kubernetes.io/name=users-roles"
+    tags: [ "env:iaadsautomationconsumer", "name:users-roles"]
+
+  - namespace: "iaadsdevconsumer"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsdevconsumer/authentication-provider"
+    labels: "app.kubernetes.io/name=authentication-provider"
+    tags: [ "env:iaadsdevconsumer", "name:authentication-provider"]
+
+  - namespace: "iaadsdevconsumer"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsdevconsumer/tier1-gateway"
+    labels: "app.kubernetes.io/name=tier1-gateway"
+    tags: [ "env:iaadsdevconsumer", "name:tier1-gateway"]
+
+  - namespace: "iaadsdevconsumer"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsdevconsumer/tier2-gateway"
+    labels: "app.kubernetes.io/name=tier2-gateway"
+    tags: [ "env:iaadsdevconsumer", "name:tier2-gateway"]
+
+  - namespace: "iaadsdevconsumer"
+    template: '{{ template "basicMessage" . }}'
+    name: "iaadsdevconsumer/tier2-proxy"
+    labels: "app.kubernetes.io/name=tier2-proxy"
+    tags: [ "env:iaadsdevconsumer", "name:tier2-proxy"]
+
+  - namespace: "iaadsdevconsumer"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsdevconsumer/users-roles"
+    labels: "app.kubernetes.io/name=users-roles"
+    tags: [ "env:iaadsdevconsumer", "name:users-roles"]
+
+  - namespace: "iaadsstagingconsumer"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsstagingconsumer/authentication-provider"
+    labels: "app.kubernetes.io/name=authentication-provider"
+    tags: [ "env:iaadsstagingconsumer", "name:authentication-provider"]
+
+  - namespace: "iaadsstagingconsumer"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsstagingconsumer/tier1-gateway"
+    labels: "app.kubernetes.io/name=tier1-gateway"
+    tags: [ "env:iaadsstagingconsumer", "name:tier1-gateway"]
+
+  - namespace: "iaadsstagingconsumer"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsstagingconsumer/tier2-gateway"
+    labels: "app.kubernetes.io/name=tier2-gateway"
+    tags: [ "env:iaadsstagingconsumer", "name:tier2-gateway"]
+
+  - namespace: "iaadsstagingconsumer"
+    template: '{{ template "basicMessage" . }}'
+    name: "iaadsstagingconsumer/tier2-proxy"
+    labels: "app.kubernetes.io/name=tier2-proxy"
+    tags: [ "env:iaadsstagingconsumer", "name:tier2-proxy"]
+
+  - namespace: "iaadsstagingconsumer"
+    template: '{{ template "withJq" . }}'
+    name: "iaadsstagingconsumer/users-roles"
+    labels: "app.kubernetes.io/name=users-roles"
+    tags: [ "env:iaadsstagingconsumer", "name:users-roles"]
+
+  - namespace: "iaadstestconsumer"
+    template: '{{ template "withJq" . }}'
+    name: "iaadstestconsumer/authentication-provider"
+    labels: "app.kubernetes.io/name=authentication-provider"
+    tags: [ "env:iaadstestconsumer", "name:authentication-provider"]
+
+  - namespace: "iaadstestconsumer"
+    template: '{{ template "withJq" . }}'
+    name: "iaadstestconsumer/tier1-gateway"
+    labels: "app.kubernetes.io/name=tier1-gateway"
+    tags: [ "env:iaadstestconsumer", "name:tier1-gateway"]
+
+  - namespace: "iaadstestconsumer"
+    template: '{{ template "withJq" . }}'
+    name: "iaadstestconsumer/tier2-gateway"
+    labels: "app.kubernetes.io/name=tier2-gateway"
+    tags: [ "env:iaadstestconsumer", "name:tier2-gateway"]
+
+  - namespace: "iaadstestconsumer"
+    template: '{{ template "basicMessage" . }}'
+    name: "iaadstestconsumer/tier2-proxy"
+    labels: "app.kubernetes.io/name=tier2-proxy"
+    tags: [ "env:iaadstestconsumer", "name:tier2-proxy"]
+
+  - namespace: "iaadstestconsumer"
+    template: '{{ template "withJq" . }}'
+    name: "iaadstestconsumer/users-roles"
+    labels: "app.kubernetes.io/name=users-roles"
+    tags: [ "env:iaadstestconsumer", "name:users-roles"]
+
