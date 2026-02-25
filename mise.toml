@@ -304,12 +304,12 @@ clear_agent() {
    # Participant
    mise run db:drop_all_tables "$K_NAMESPACE" authenticationprovider
    mise run db:drop_all_tables "$K_NAMESPACE" usersroles
+   mise run db:drop_all_tables "$K_NAMESPACE" keycloak
 
    if echo "$K_NAMESPACE" | grep -q authority; then
      # Authority
      mise run db:drop_all_tables "$K_NAMESPACE" ejbca
      kubectl -n "$K_NAMESPACE" delete secret ejbca-rest-api-secret
-     mise run db:drop_all_tables "$K_NAMESPACE" keycloak
      mise run db:drop_all_tables "$K_NAMESPACE" identityprovider
      mise run db:drop_all_tables "$K_NAMESPACE" onboarding
      mise run db:drop_all_tables "$K_NAMESPACE" securityattributesprovider
