@@ -345,7 +345,7 @@ services_endpoints() {
   local chart_file="simpl-repo/$project_name/charts/values.yaml"
   [ -f "$chart_file" ] || {
      echo "Invalid project."
-     exit 1;
+     return 1;
   }
   cat "$chart_file" | yq -ojson | jq 'to_entries[] | select((.value|type)=="object" and .value.projectID!=null) | {name:.key, projectID:.value.projectID, version: .value.targetRevision, repo:"https://code.europa.eu/api/v4/projects/\\(.value.projectID)/packages/helm/stable"}' 
 }
@@ -611,12 +611,12 @@ argo_copy_parameters() {
   Y2="$(kubectl -n argocd get application ${K_NAMESPACE_TO}-deployer -oyaml | yq 'del(.status)')"
   if [[ -z "$Y1" || "$Y1" == "null" ]]; then
     >&2 echo "Application ${K_NAMESPACE_FROM}-deployer not found or invalid"
-    exit 1
+    return 1
   fi
 
   if [[ -z "$Y2" || "$Y2" == "null" ]]; then
     >&2 echo "Application ${K_NAMESPACE_TO}-deployer not found or invalid"
-    exit 1
+    return 1
   fi
   Y3="$(echo "$Y2" | yq '(.spec.source.targetRevision) = "'"$(echo "$Y1" | yq .spec.source.targetRevision)"'" | (.spec.source.helm.parameters) = '"$(echo "$Y1" | yq -ojson .spec.source.helm.parameters)")"
   set +e
@@ -630,10 +630,10 @@ argo_copy_parameters() {
     echo "$Y3" | kubectl apply -f -
   elif [ "$diff_ret_code" -eq 2 ]; then
     >&2 echo "Diff error!" >&2
-    exit 1
+    return 1
   else
     >&2 echo "No changes detected"
-    exit 2
+    return 2
   fi
 }
 argo_copy_parameters
