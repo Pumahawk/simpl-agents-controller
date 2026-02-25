@@ -699,6 +699,10 @@ repository_write_targetRevision_to_values() {
     local Y_CONTENT="$(yq "$VALUE_FILE")"
     local Y_CONTENT_NEW="$Y_CONTENT"
     local Y_CONTENT_NEW="$(kubectl -n argocd get application "${K_NAMESPACE}"-deployer -oyaml | yq '.spec.source.helm.parameters[] | select(.name | test("targetRevision")) | "(.\\(.name)) = \\"\\(.value)\\""' | ( while read line; do Y_CONTENT_NEW="$(echo "$Y_CONTENT_NEW" | yq "$line")"; done; echo "$Y_CONTENT_NEW";))"
+    if [ -z "$Y_CONTENT_NEW" ]; then
+      >&2 echo "Ivalid content. Skip file update."
+      return 1
+    fi
     set +e
     diff --color=always -u <(echo "$Y_CONTENT") <(echo "$Y_CONTENT_NEW")
     set -e
