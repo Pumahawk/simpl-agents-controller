@@ -767,3 +767,67 @@ mise run repository:write_targetRevision_to_values iaadsstagingauthority simpl-r
 mise run repository:write_targetRevision_to_values iaadsstagingconsumer simpl-repo/consumer-iaa/charts/values.yaml
 mise run repository:write_targetRevision_to_values iaadsstagingdataprovider simpl-repo/provider-iaa/charts/values.yaml
 """
+
+[tasks."services:token"]
+shell = "bash -ec"
+run = """
+services_login() {
+  local K_NAMESPACE="${1?Missing namespace}"
+  local USERNAME="${2?Missing username}"
+  local CLIENT_ID="frontend-cli"
+  local BASE_URL="$(service_token_get_base_url "$K_NAMESPACE")"
+  curl -s -X POST "$BASE_URL/protocol/openid-connect/token" \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -d "client_id=frontend-cli" \
+    -d "username=${USERNAME}" \
+    -d "password=password" \
+    -d "grant_type=password"
+}
+services_token() {
+  local K_NAMESPACE="${1?Missing namespace}"
+  local USERNAME="${2?Missing username}"
+  local TOKEN_FILE="${USERNAME}-${K_NAMESPACE}-token.json"
+  local LOGIN_TOKEN="";
+  if [ -f "$TOKEN_FILE" ]; then
+    LOGIN_TOKEN="$(cat "$TOKEN_FILE")"
+    if [[ $(date -Iseconds) > $(date -Iseconds -d @$(<<<"$LOGIN_TOKEN" jq -r .access_token | cut -d. -f2 | base64 -d 2>/dev/null | jq .exp)) ]]; then
+      local REFRESH_TOKEN="$(<<<"$LOGIN_TOKEN" jq -r .refresh_token)"
+      LOGIN_TOKEN="$(service_token_refresh "$K_NAMESPACE" "$REFRESH_TOKEN")"
+      if [ -z "$LOGIN_TOKEN" ]; then
+        >&2 echo "Invalid token response"
+        return 1;
+      fi
+      echo "$LOGIN_TOKEN" > "$TOKEN_FILE"
+    fi
+  else
+    LOGIN_TOKEN="$(services_login "$K_NAMESPACE" "$USERNAME")"
+    if [ -z "$LOGIN_TOKEN" ]; then
+      >&2 echo "Invalid token response"
+      return 1;
+    fi
+    echo "$LOGIN_TOKEN" > "$TOKEN_FILE"
+  fi
+  <<<"$LOGIN_TOKEN" jq -r .access_token
+}
+service_token_refresh() {
+  local K_NAMESPACE="${1?Missing namespace}"
+  local REFRESH_TOKEN="${2?Missing refresh token}"
+  local BASE_URL="$(service_token_get_base_url "$K_NAMESPACE")"
+  curl -s -X POST "$BASE_URL/protocol/openid-connect/token" \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -d "client_id=frontend-cli" \
+    -d "grant_type=refresh_token" \
+    -d "refresh_token=${REFRESH_TOKEN}"
+}
+service_token_get_base_url() {
+  local K_NAMESPACE="${1?Missing namespace}"
+  local FQDN_PREFIX="participant";
+  local REALM="participant"
+  if [[ "$K_NAMESPACE" =~ authority ]]; then
+    FQDN_PREFIX="authority";
+    REALM="authority";
+  fi
+  echo -n "https://${FQDN_PREFIX}.be.${K_NAMESPACE}${FQDN_SUFFIX}/auth/realms/${REALM}"
+}
+services_token
+"""
