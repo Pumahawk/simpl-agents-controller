@@ -41,8 +41,8 @@ yq = "4.47.2"
 
 [env]
 KUBECONFIG = "__REQUIRED_OVERRIDE__"
-AUTHORITY_NAMESPACE = "authority01"
-TIER2_FQDN="tls.authority.authority01.sandbox-iaa.simpl-europe.eu"
+FQDN_SUFFIX=".sandbox-iaa.simpl-europe.eu"
+TIER2_FQDN_PREFIX="tls."
 
 # See ESCAPE-REF: KC-MISE-QUOTE-001
 [vars]
@@ -116,17 +116,17 @@ curl -v -X POST "$AUTHORITY_AUTH_PROVIDER/v1/keypairs/generate"
 curl -v -X POST "$AUTHORITY_AUTH_PROVIDER/v1/csr/generate" \
 --header 'Content-Type: application/json' \
 --data-raw '{
-  "commonName": "'"$TIER2_FQDN"'",
+  "commonName": "'"${TIER2_FQDN_PREFIX}${K_NAMESPACE}${FQDN_SUFFIX}"'",
   "country": "it",
-  "organization": "authority01",
-  "organizationalUnit": "authority01"
+  "organization": "'"${K_NAMESPACE}"'",
+  "organizationalUnit": "'"${K_NAMESPACE}"'"
 }' > csr.pem
 
 >&2 echo Creating Authority participant
 PARTICIPANT_ID=$(curl -v -X POST "$AUTHORITY_IDENTITY_PROVIDER/v1/participants" \
 --header 'Content-Type: application/json' \
 --data-raw '{
-  "organization": "authority01",
+  "organization": "'"${K_NAMESPACE}"'",
   "participantType": "GOVERNANCE_AUTHORITY"
 }' | sed -E 's/^"(.*)"$/\\1/')
 

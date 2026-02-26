@@ -1,2 +1,2 @@
 [env]
-TIER2_FQDN="tls.authority.authority01.integrated.simpl-europe.eu"
+FQDN_SUFFIX=".integrated.simpl-europe.eu"
