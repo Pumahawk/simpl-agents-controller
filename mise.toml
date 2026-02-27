@@ -788,9 +788,9 @@ services_token() {
   local USERNAME="${2?Missing username}"
   local TOKEN_FILE="${USERNAME}-${K_NAMESPACE}-token.json"
   local LOGIN_TOKEN="";
-  if [ -f "$TOKEN_FILE" ]; then
+  if [ -f "$TOKEN_FILE" ] && [ "$(cat "$TOKEN_FILE" | jq -r .access_token)" != "null" ]; then
     LOGIN_TOKEN="$(cat "$TOKEN_FILE")"
-    if [[ $(date -Iseconds) > $(date -Iseconds -d @$(<<<"$LOGIN_TOKEN" jq -r .access_token | cut -d. -f2 | base64 -d 2>/dev/null | jq .exp)) ]]; then
+    if [[ $(date -Iseconds) > $(date -Iseconds -d @"$(<<<"$LOGIN_TOKEN" jq -r .access_token | cut -d. -f2 | base64 -d 2>/dev/null | jq .exp)") ]]; then
       local REFRESH_TOKEN="$(<<<"$LOGIN_TOKEN" jq -r .refresh_token)"
       LOGIN_TOKEN="$(service_token_refresh "$K_NAMESPACE" "$REFRESH_TOKEN")"
       if [ -z "$LOGIN_TOKEN" ]; then
