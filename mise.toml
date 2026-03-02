@@ -325,6 +325,15 @@ clear_agent() {
 clear_agent
 """
 
+[tasks."keycloak:kcadm"]
+shell = "bash -ec"
+run = """
+keycloak_kcadm() {
+  local K_NAMESPACE="${1?"Missing namespace"}"; shift
+  kubectl -n "$K_NAMESPACE" exec -i keycloak-0 -- bash -c '{{vars.keycloak_sh}} kcadm $@' -- "$@"
+}
+keycloak_kcadm
+"""
 [tasks."keycloak:cli"]
 shell = "bash -ec"
 run = """
