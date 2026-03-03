@@ -145,6 +145,7 @@ curl -v -H "Authorization: Bearer $TMP_TOKEN" -X POST "$AUTHORITY_AUTH_PROVIDER/
 }
 cluster_authority_initialization_by_namespace
 """
+
 # sandbox-iaa/consumer01-postgres-passwords
 [tasks."cluster:secrets"]
 shell = "bash -c"
@@ -839,4 +840,54 @@ service_token_get_base_url() {
   echo -n "https://${FQDN_PREFIX}.be.${K_NAMESPACE}${FQDN_SUFFIX}/auth/realms/${REALM}"
 }
 services_token
+"""
+
+[tasks."argo:spec-diff"]
+shell = "bash -ec"
+run = """
+argo_spec_diff() {
+  K_N1="${1?Missing namespace 1}"
+  K_N2="${2?Missing namespace 2}"
+  shift; shift;
+  set +e
+  diff --color=auto -u "$@" \
+  <(kubectl -n argocd get -oyaml application ${K_N1}-deployer | yq .spec) \
+  <(kubectl -n argocd get -oyaml application ${K_N2}-deployer | yq .spec)
+  local diff_error="$?"
+  if [ "$diff_error" != 1 ]; then return 1; fi;
+  set -e
+}
+argo_spec_diff
+"""
+
+[tasks."argo:spec-diff-env-x"]
+shell = "bash -ec"
+run = """
+argo_spec_diff_env() {
+  K_N1="${1?Missing namespace 1}"
+  K_N2="${2?Missing namespace 2}"
+  shift; shift;
+  local env
+  local E1
+  local E2
+  for env in authority consumer dataprovider; do
+    E1="$(sed 's|X|'"$env"'|' <<<"$K_N1")"
+    E2="$(sed 's|X|'"$env"'|' <<<"$K_N2")"
+    >&2 echo "Diff env E1=["$E1"] E2=["$E2"]"
+    mise run argo:spec-diff "$E1" "$E2" "$@"
+  done
+}
+argo_spec_diff_env
+"""
+
+[tasks."argo:spec-diff-env"]
+shell = "bash -ec"
+run = """
+argo_spec_diff_env() {
+  K_N1="${1?Missing env 1}"
+  K_N2="${2?Missing env 2}"
+  shift; shift;
+  mise run argo:spec-diff-env-x "iaads${K_N1}X" "iaads${K_N2}X" "$@"
+}
+argo_spec_diff_env
 """
