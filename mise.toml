@@ -692,3 +692,6 @@ mise run \\
 ::: environment:remote_update iaadstestconsumer \\
 ::: environment:remote_update iaadstestdataprovider \\
 """
+
+[settings]
+env_shell_expand = false
