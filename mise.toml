@@ -906,3 +906,13 @@ argo_get_version_parameters() {
 }
 argo_get_version_parameters
 """
+
+[tasks."argo:get_target_revision"]
+shell = "bash -ec"
+run = """
+argo_get_target_revision() {
+  NAME="${1?Missing namespace}"
+  kubectl -n argocd get application "${NAME}" -oyaml | yq -op '.spec.sources[] | {.chart: . }' | grep targetRevision
+}
+argo_get_target_revision
+"""
