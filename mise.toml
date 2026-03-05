@@ -34,6 +34,9 @@
 # single quotes.
 # -----------------------------------------------------------------------------
 
+[settings]
+env_shell_expand = false
+
 [tools]
 kubectl = "1.34.1"
 jq = "1.8.1"
@@ -784,18 +787,20 @@ run = """
 services_login() {
   local K_NAMESPACE="${1?Missing namespace}"
   local USERNAME="${2?Missing username}"
+  local PASSWORD="${3-"password"}"
   local CLIENT_ID="frontend-cli"
   local BASE_URL="$(service_token_get_base_url "$K_NAMESPACE")"
   curl -s -X POST "$BASE_URL/protocol/openid-connect/token" \
     -H "Content-Type: application/x-www-form-urlencoded" \
     -d "client_id=frontend-cli" \
     -d "username=${USERNAME}" \
-    -d "password=password" \
+    -d "password=$PASSWORD" \
     -d "grant_type=password"
 }
 services_token() {
   local K_NAMESPACE="${1?Missing namespace}"
   local USERNAME="${2?Missing username}"
+  local PASSWORD="${3-"password"}"
   local TOKEN_FILE="${USERNAME}-${K_NAMESPACE}-token.json"
   local LOGIN_TOKEN="";
   if [ -f "$TOKEN_FILE" ] && [ "$(cat "$TOKEN_FILE" | jq -r .access_token)" != "null" ]; then
@@ -810,7 +815,7 @@ services_token() {
       echo "$LOGIN_TOKEN" > "$TOKEN_FILE"
     fi
   else
-    LOGIN_TOKEN="$(services_login "$K_NAMESPACE" "$USERNAME")"
+    LOGIN_TOKEN="$(services_login "$K_NAMESPACE" "$USERNAME" "$PASSWORD")"
     if [ -z "$LOGIN_TOKEN" ]; then
       >&2 echo "Invalid token response"
       return 1;
@@ -892,5 +897,12 @@ argo_spec_diff_env() {
 argo_spec_diff_env
 """
 
-[settings]
-env_shell_expand = false
+[tasks."argo:get_version_parameters"]
+shell = "bash -ec"
+run = """
+argo_get_version_parameters() {
+  K_NAMESPACE="${1?Missing namespace}"
+  kubectl -n argocd get application "${K_NAMESPACE}"-deployer -oyaml | yq -r '.spec.source.helm.parameters[] | select(.name | test("target")) | "\\(.name)=\\(.value)"'
+}
+argo_get_version_parameters
+"""
