@@ -61,7 +61,7 @@ spec:
               export PATH="/root/.local/bin:$PATH"
 
               echo "Cloning repository..."
-              git clone https://github.com/Pumahawk/simpl-agents-controller.git /app
+              git clone -b w-deployer https://github.com/Pumahawk/simpl-agents-controller.git /app
               cd /app
 
               echo "Running mise install..."
