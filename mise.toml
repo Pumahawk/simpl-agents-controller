@@ -891,3 +891,6 @@ argo_spec_diff_env() {
 }
 argo_spec_diff_env
 """
+
+[settings]
+env_shell_expand = false
