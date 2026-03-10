@@ -916,3 +916,12 @@ argo_get_target_revision() {
 }
 argo_get_target_revision
 """
+
+[tasks."environment:get_all_pod_images"]
+shell = "bash -ec"
+run = """
+environment_get_all_pod_images() {
+ kubectl get pod -A -oyaml | yq '.items[] | "\\(.metadata.namespace) \\(.metadata.name) \\(.spec.containers[].image | select(. | test(\\"code.euro\\")))"' | grep euro
+}
+environment_get_all_pod_images
+"""
