@@ -219,20 +219,12 @@ drop_all_tables() {
     return 1
   fi
 
-  local DB_PASS="$(mise run db:get_password "$K_NAMESPACE" "$DB_USER")"
+  local PG_MASTER_POD="$(kubectl -n common01 get pods -l spilo-role=master -ojsonpath={.items[0].metadata.name})"
 
-  # --- Parameter validation ---
-  if [[ -z "$DB_PASS" ]]; then
-    echo "ERROR: Missing required parameters."
-    echo "ERROR: Missing password"
-    return 1
-  fi
+  echo "Connecting to database ${K_NAMESPACE}_${DB_USER} as postgres..."
 
-  echo "Connecting to database as ${K_NAMESPACE}_${DB_USER}..."
-
-  kubectl exec -i -n common01 pg-cluster-2 -- sh -c "
-    export PGPASSWORD='${DB_PASS}';
-    psql --host=pg-cluster -U ${K_NAMESPACE}_${DB_USER} <<'SQL'
+  kubectl exec -i -n common01 "$PG_MASTER_POD" -- sh -c "
+    psql -U postgres -d ${K_NAMESPACE}_${DB_USER} <<'SQL'
 DO \\$\\$
 DECLARE
     r RECORD;
