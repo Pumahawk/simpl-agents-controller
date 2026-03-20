@@ -929,3 +929,15 @@ environment_get_all_pod_images() {
 }
 environment_get_all_pod_images
 """
+
+[tasks."environment:get_europa_images"]
+shell = "bash -ec"
+run = """
+kubectl get pod -A  -oyaml | yq '.items[] | .metadata.namespace as $namespace | .status.containerStatuses[] | "\\(.image) \\($namespace) \\(.name) \\(.ready)"' | column -t | grep europa
+"""
+
+[tasks."cluster:all_charts_versions"]
+shell = "bash -ec"
+run = """
+kubectl get pod -A -oyaml | yq '.items[] | .metadata.labels."helm.sh/chart" as $chart | .metadata.namespace as $namespace | .metadata.labels."app.kubernetes.io/name" as $name | "\\($namespace) \\($name) \\($chart)"'
+"""
