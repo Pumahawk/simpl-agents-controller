@@ -933,7 +933,7 @@ environment_get_all_pod_images
 [tasks."environment:get_europa_images"]
 shell = "bash -ec"
 run = """
-kubectl get pod -A  -oyaml | yq '.items[] | .metadata.namespace as $namespace | .status.containerStatuses[] | "\\(.image) \\($namespace) \\(.name) \\(.ready)"' | column -t | grep europa
+kubectl get pod -A  -oyaml | yq '.items[] | .metadata.namespace as $namespace | .status.containerStatuses[] | "\\(.image) \\($namespace) \\(.name) \\(.ready)"' | grep europa
 """
 
 [tasks."cluster:all_charts_versions"]
