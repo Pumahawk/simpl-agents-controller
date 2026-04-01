@@ -649,12 +649,12 @@ mise run \\
 ::: argo:sync authority-iaa-01 \\
 ::: argo:sync consumer-iaa-01 \\
 ::: argo:sync provider-iaa-01 \\
+::: argo:sync iaadsstagingauthority \\
+::: argo:sync iaadsstagingconsumer \\
+::: argo:sync iaadsstagingdataprovider \\
 ::: argo:sync iaadsautomationauthority \\
 ::: argo:sync iaadsautomationconsumer \\
 ::: argo:sync iaadsautomationdataprovider
-# ::: argo:sync iaadsstagingauthority \\
-# ::: argo:sync iaadsstagingconsumer \\
-# ::: argo:sync iaadsstagingdataprovider \\
 """
 
 [tasks."argo:copy_parameters"]
@@ -727,6 +727,9 @@ mise run \\
     environment:remote_update iaadsdevauthority \\
 ::: environment:remote_update iaadsdevconsumer \\
 ::: environment:remote_update iaadsdevdataprovider \\
+::: environment:remote_update iaadsstagingauthority \\
+::: environment:remote_update iaadsstagingconsumer \\
+::: environment:remote_update iaadsstagingdataprovider \\
 ::: environment:remote_update iaadstestauthority \\
 ::: environment:remote_update iaadstestconsumer \\
 ::: environment:remote_update iaadstestdataprovider \\
@@ -736,9 +739,6 @@ mise run \\
 ::: environment:remote_update iaadsautomationauthority \\
 ::: environment:remote_update iaadsautomationconsumer \\
 ::: environment:remote_update iaadsautomationdataprovider
-# ::: environment:remote_update iaadsstagingauthority \\
-# ::: environment:remote_update iaadsstagingconsumer \\
-# ::: environment:remote_update iaadsstagingdataprovider \\
 """
 
 [tasks."environment:remote_update_tests"]
