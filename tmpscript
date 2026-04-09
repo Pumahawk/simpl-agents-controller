@@ -1,0 +1,139 @@
+#!/bin/sh
+
+error_message=""
+if [ -z "$SECRET_ENGINE" ]; then
+  error_message="${error_message}SECRET_ENGINE, "
+fi
+if [ -z "$AGENT_NAMESPACE" ]; then
+  error_message="${error_message}AGENT_NAMESPACE, "
+fi
+
+if [ -n "$error_message" ]; then
+  error_message="$(echo "$error_message" | sed 's/, $//')"
+  >&2 echo "Missing mandatory environment variables: $error_message"
+  exit 0
+fi
+
+tmp_file_out=/tmp/t
+
+main() {
+  # keycloak_wait_pod
+  secret="$(keycloak_onboarding_sa_secret)"
+  openbao_load_onboarding_sa_secret "$secret"
+}
+
+keycloak_wait_pod() {
+  local sleep_seconds=20
+  log "Check keycloak pod avaiability"
+  until (
+    kubectl_cmd get pod | grep --color=always -e $ -e keycloak-0
+    kubectl_cmd get pod | grep 'keycloak-0 ' | grep -q 'Running'
+  ); do
+    log "Waiting keycloak startup. Sleep $sleep_seconds seconds"
+    sleep "$sleep_seconds"
+  done
+}
+
+keycloak_onboarding_sa_secret() {
+  kubectl_cmd exec -i keycloak-0 -- bash -e <<'EOF'
+  keycloak_login() {
+    >&2 echo "Login to keycloak admin..."
+    /opt/keycloak/bin/kcadm.sh config credentials \
+      --config /tmp/kcadm.config \
+      --server http://localhost:8080 \
+      --realm master \
+      --client admin-cli \
+      --user admin \
+      --password "$(cat /opt/bitnami/keycloak/secrets/admin-password)"
+    }
+
+  get_client_id_from_realm_output() {
+    name="${1?Missing name}" 
+    file="${2?Missing output file}"
+    >&2 echo "Retrieve client id name=[$name] output_file=[$file]"
+    out="$(cat "$file" | grep -B1 '  "clientId" : "'"$name"'"' | grep '"id"')" &&
+      sed 's/.*"id" : "\([^"].*\)".*/\1/' <<<"$out"
+  }
+
+  wait_onboarding_realm_and_client_onboarding_sa() {
+    tmp_output_file="${1?Missing tmp_output_file}"
+    tmp_output_client_id="${2?Missing tmp_output_client_id}"
+    until (
+      get_onboarding_realm > "$tmp_output_file" &&
+        get_onboarding_sa_client_id "$tmp_output_file" > "$tmp_output_client_id"
+      ); do
+      >&2 echo "Unable to get onboarding realm and onboarding-sa client. Retry after 20 seconds."
+      sleep 20
+      keycloak_login
+    done
+  }
+
+  get_onboarding_realm() {
+    >&2 echo "Get realm=[onboarding]"
+    /opt/keycloak/bin/kcadm.sh \
+      get \
+      --config /tmp/kcadm.config \
+      realms/onboarding/clients
+  }
+
+  get_onboarding_sa_client_id() {
+    realm_output_file="${1?Missing realm output file}" 
+    >&2 echo "Get clientId=[onboarding-sa]" &&
+    get_client_id_from_realm_output onboarding-sa "$realm_output_file"
+  }
+
+  tmp_output_file=/tmp/t.json
+  tmp_output_file_client=/tmp/t.json
+  tmp_output_client_id=/tmp/client_id.json
+
+
+  # First keycloak login
+  keycloak_login
+
+  # Get wait onboarding is installed end retry
+  wait_onboarding_realm_and_client_onboarding_sa "$tmp_output_file" "$tmp_output_client_id"
+
+  client_id="$(cat "$tmp_output_client_id")"
+  >&2 echo "Find onboarding-sa client_id=[$client_id]"
+  >&2 echo "Get secret clients client_id=[$client_id]"
+  /opt/keycloak/bin/kcadm.sh \
+    get \
+    --config /tmp/kcadm.config \
+    "realms/onboarding/clients/$client_id" > "$tmp_output_file_client"
+  secret="$(
+    grep '  "secret" : "' "$tmp_output_file_client" |
+      sed 's/.*"secret" : "\([^"].*\)".*/\1/'
+    )"
+  >&2 echo "Retrieved onboaring_sa secret=["$(cut -c -5 <<<"$secret")..."]"
+  echo -n "$secret"
+EOF
+}
+
+openbao_load_onboarding_sa_secret() {
+  secret="${1?Missing secret}"
+  T_BAO=$(kubectl -n common01 get secret secrets-root-token -o jsonpath="{.data.token}" | base64 -d)
+  kubectl -n common01 exec -i openbao-common01-0 -- sh -e /dev/stdin \
+    "$T_BAO" \
+    "$SECRET_ENGINE" \
+    "$AGENT_NAMESPACE" \
+    "$secret" \
+    <<'EOF'
+  T_BAO="${1?Missing T_BAO}"
+  SECRET_ENGINE="${2?Missing SECRET_ENGINE}"
+  AGENT_NAMESPACE="${3?Missing AGENT_NAMESPACE}"
+  SECRET_CLIENT="${4?Missing SECRET_CLIENT}"
+  >&2 echo "Load onboarding_sa secret. SECRET_ENGINE=[$SECRET_ENGINE] AGENT_NAMESPACE=[$AGENT_NAMESPACE]"
+  bao login "$T_BAO" > /dev/null
+  bao kv patch "${SECRET_ENGINE}/${AGENT_NAMESPACE}-keycloak" onboarding_sa="$SECRET_CLIENT"
+EOF
+}
+
+kubectl_cmd() {
+  kubectl -n iaadsdevauthority "$@"
+}
+
+log() {
+  >&2 echo "$@"
+}
+
+main "$@"
