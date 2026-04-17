@@ -297,6 +297,17 @@ run = """
 clear_agent() {
   local K_NAMESPACE="$1"
 
+  echo "Scale to 0 deployments and statefulset"
+  readarray -t dpls < <( kubectl -n $K_NAMESPACE get deploy -oname )
+  readarray -t stfs < <( kubectl -n $K_NAMESPACE get statefulset -oname )
+  scalelist=( "${dpls[@]}" "${stfs[@]}" )
+  if [ -n "$scalelist" ]; then
+    kubectl scale --replicas 0 -n $K_NAMESPACE  "${scalelist[@]}"
+  else
+    echo "Not deployments or statefulset to scale"
+  fi
+
+  echo "Delete all databases"
   # --- Parameter validation ---
   if [[ -z "$K_NAMESPACE" ]]; then
     echo "ERROR: Missing required parameters."
@@ -317,6 +328,25 @@ clear_agent() {
      mise run db:drop_all_tables "$K_NAMESPACE" onboarding
      mise run db:drop_all_tables "$K_NAMESPACE" securityattributesprovider
    fi
+
+  echo "Delete all jobs"
+  readarray jobslist < <(kubectl -n "$K_NAMESPACE" get job -oname)
+  if [ -n "$jobslist" ]; then
+    kubectl delete -n "$K_NAMESPACE" "${jobslist[@]}"
+  else
+    echo "Not found jobs to delete"
+  fi
+
+  echo "Sync with argocd the deployer and the final chart"
+  mise run argo:cli  app sync --prune "$K_NAMESPACE-deployer"
+  mise run argo:cli  app sync --prune "$K_NAMESPACE"
+
+  echo "Scale to 1 deployments and statefulset"
+  if [ -n "$scalelist" ]; then
+    kubectl scale --replicas 1 -n $K_NAMESPACE  "${scalelist[@]}"
+  else
+    echo "Not deployments or statefulset to scale"
+  fi
 }
 clear_agent
 """
