@@ -323,7 +323,7 @@ clear_agent() {
    if echo "$K_NAMESPACE" | grep -q authority; then
      # Authority
      mise run db:drop_all_tables "$K_NAMESPACE" ejbca
-     kubectl -n "$K_NAMESPACE" delete secret ejbca-rest-api-secret
+     kubectl -n "$K_NAMESPACE" delete secret ejbca-rest-api-secret || true
      mise run db:drop_all_tables "$K_NAMESPACE" identityprovider
      mise run db:drop_all_tables "$K_NAMESPACE" onboarding
      mise run db:drop_all_tables "$K_NAMESPACE" securityattributesprovider
