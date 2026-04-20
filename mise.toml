@@ -330,9 +330,9 @@ clear_agent() {
    fi
 
   echo "Delete all jobs"
-  readarray jobslist < <(kubectl -n "$K_NAMESPACE" get job -oname)
+  readarray -t jobslist < <(kubectl -n "$K_NAMESPACE" get job -oname)
   if [ -n "$jobslist" ]; then
-    kubectl delete -n "$K_NAMESPACE" "${jobslist[@]}" || true
+    kubectl -n "$K_NAMESPACE" delete  "${jobslist[@]}" || true
   else
     echo "Not found jobs to delete"
   fi
