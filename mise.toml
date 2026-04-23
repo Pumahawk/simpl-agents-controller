@@ -295,7 +295,9 @@ get_secrets
 shell = "bash -ec"
 run = """
 clear_agent() {
-  local K_NAMESPACE="$1"
+  local K_NAMESPACE="$(cut -d/ -f1 <<<"$1")"
+  local DEPLOYER_NAME="$(cut -d/ -f2 <<<"$1")"
+  DEPLOYER_NAME="${DEPLOYER_NAME-"$K_NAMESPACE"}-deployer"
 
   echo "Scale to 0 deployments and statefulset"
   readarray -t dpls < <( kubectl -n $K_NAMESPACE get deploy -oname )
@@ -338,7 +340,7 @@ clear_agent() {
   fi
 
   echo "Sync with argocd the deployer and the final chart"
-  mise run argo:cli  app sync --prune "$K_NAMESPACE-deployer"
+  mise run argo:cli  app sync --prune "$DEPLOYER_NAME"
   mise run argo:cli  app sync --prune "$K_NAMESPACE"
 
   echo "Scale to 1 deployments and statefulset"
