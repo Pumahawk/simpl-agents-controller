@@ -973,3 +973,17 @@ shell = "bash -ec"
 run = """
 kubectl get pod -A -oyaml | yq '.items[] | .metadata.labels."helm.sh/chart" as $chart | .metadata.namespace as $namespace | .metadata.labels."app.kubernetes.io/name" as $name | "\\($namespace) \\($name) \\($chart)"'
 """
+
+[tasks."postgrest:restart"]
+shell = "bash -ec"
+run = """
+postgrest_restart() {
+K_NAMESPACE="${1?Missing namespace}"
+>&2 echo "Restart postgrest namespace=[$K_NAMESPACE]"
+readarray -t deployments < <(kubectl -n "$K_NAMESPACE" get -o name deployments | grep rest)
+if [ -n "${deployments}" ]; then
+  kubectl -n "$K_NAMESPACE" rollout restart "${deployments[@]}"
+fi
+}
+postgrest_restart
+"""
