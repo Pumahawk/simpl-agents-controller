@@ -1,0 +1,55 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: authority02-deployer
+  namespace: argocd
+spec:
+  destination:
+    namespace: authority02
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: authority
+    helm:
+      values: |
+        values:
+          branch: feature/splits
+        authority_gaia_x_edc:
+          targetRevision: 0.0.1-rc.51
+          valuesBranch: release
+        project: default
+        namespaceTag: 
+          authority: authority02
+          common: common02
+        domainSuffix: integrated.simpl-europe.eu
+        argocd:
+          appname: authority02
+          namespace: argocd
+        cluster:
+          address: https://kubernetes.default.svc
+          namespace: authority02
+          commonToolsNamespace: common02
+          issuer: dev-prod-http
+        secrets:
+          role: integrated-role
+          secretEngine: integrated
+        monitoring:
+          enabled: true
+        resourcePreset: low
+        authority_monitoring:
+          targetRevision: 0.1.0
+          valuesBranch: v0.1.0
+        authority_iaa:
+          targetRevision: 1.3.0
+          valuesBranch: v1.3.0
+          extraValues:
+            eidas:
+              enabled: "true"
+            development:
+              enableTestConfigurations: true
+              enableCnCTier1TestConfigurations: true
+              enableAutomaticInitialization: true
+              enableAutoKeycloakSecretSync: true
+    path: '""'
+    repoURL: https://code.europa.eu/api/v4/projects/902/packages/helm/stable
+    targetRevision: 3.0.0-F-feature-splits.832.8553dac4
