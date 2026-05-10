@@ -4,8 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
-	"strings"
 	"text/tabwriter"
 
 	"github.com/Pumahawk/simpl-agents-controller/internal/cmd"
@@ -69,10 +69,9 @@ var RegistryCmd = cmd.Cmd{
 var LastVersionCmd = cmd.Cmd{
 	CName: "last-version",
 	CRun: func(args []string) error {
-		var ref, typ string
+		var ref string
 		fs := flag.NewFlagSet("", flag.ExitOnError)
 		fs.StringVar(&ref, "ref", "main", "")
-		fs.StringVar(&typ, "type", "helm", "")
 		fs.Parse(args)
 
 		projectIds := prIdsDemux.Demux(fs.Args())
@@ -91,10 +90,10 @@ var LastVersionCmd = cmd.Cmd{
 		find := make(map[int]bool)
 		fmt.Fprintf(w, "Project\tName\tVersion\n")
 		for v := range cv {
-			if v.Ref == ref && v.Type == typ && !strings.Contains(v.Version, "latest") {
-				if !find[v.ProjectId] {
-					fmt.Fprintf(w, "%d\t%q\t%q\n", v.ProjectId, v.Name, v.Version)
-					find[v.ProjectId] = true
+			if v.Ref == ref && v.Type == v.PrInfo.Type && !regexp.MustCompile(`\.latest$`).MatchString(v.Version) {
+				if !find[v.PrInfo.Id] {
+					fmt.Fprintf(w, "%d\t%q\t%q\n", v.PrInfo.Id, v.PrInfo.Name, v.Version)
+					find[v.PrInfo.Id] = true
 					v.Stop()
 				}
 			}

@@ -8,12 +8,11 @@ import (
 )
 
 type Version struct {
-	ProjectId int
-	Name      string
-	Ref       string
-	Type      string
-	Version   string
-	Stop      func()
+	PrInfo  PrInfo
+	Ref     string
+	Type    string
+	Version string
+	Stop    func()
 }
 
 func GetVersions(projectsInfo []PrInfo) <-chan Version {
@@ -45,12 +44,11 @@ func GetVersions(projectsInfo []PrInfo) <-chan Version {
 						}
 						for _, it := range items {
 							cv <- Version{
-								ProjectId: info.Id,
-								Name:      it.Name,
-								Ref:       it.Pipeline.Ref,
-								Type:      it.PackageType,
-								Version:   it.Version,
-								Stop:      ctxCanc,
+								PrInfo:  info,
+								Ref:     it.Pipeline.Ref,
+								Type:    it.PackageType,
+								Version: it.Version,
+								Stop:    ctxCanc,
 							}
 						}
 					}

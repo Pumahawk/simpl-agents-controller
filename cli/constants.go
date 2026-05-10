@@ -1,27 +1,27 @@
 package main
 
-var prCommon = PrInfo{796, "helm"}
-var prAuthenticationProvider = PrInfo{939, "helm"}
-var prEidasKeycloak = PrInfo{1313, "helm"}
-var prEidasNode = PrInfo{1312, "helm"}
-var prFeAuthenticationProvider = PrInfo{1308, "helm"}
-var prFeIdentityProvider = PrInfo{1311, "helm"}
-var prFeOnboarding = PrInfo{1307, "helm"}
-var prFeSecurityAttributeProvider = PrInfo{1309, "helm"}
-var prFeUsersAndRoles = PrInfo{1310, "helm"}
-var prIdentityProvider = PrInfo{913, "helm"}
-var prKeycloakAuthenticator = PrInfo{915, "helm"}
-var prOnboarding = PrInfo{770, "helm"}
-var prSecurityAttributesProvider = PrInfo{861, "helm"}
-var prSimplHttpClient = PrInfo{859, "helm"}
-var prTier1Authentication = PrInfo{1457, "helm"}
-var prTier1Gateway = PrInfo{772, "helm"}
-var prTier2Gateway = PrInfo{860, "helm"}
-var prTier2Proxy = PrInfo{1112, "helm"}
-var prUsersRoles = PrInfo{771, "helm"}
-var prChAuthority = PrInfo{1402, "helm"}
-var prChConsumer = PrInfo{1404, "helm"}
-var prChProvider = PrInfo{1403, "helm"}
+var prCommon = PrInfo{796, "maven", "Common"}
+var prAuthenticationProvider = PrInfo{939, "helm", "AuthenticationProvider"}
+var prEidasKeycloak = PrInfo{1313, "maven", "EidasKeycloak"}
+var prEidasNode = PrInfo{1312, "helm", "EidasNode"}
+var prFeAuthenticationProvider = PrInfo{1308, "helm", "FeAuthenticationProvider"}
+var prFeIdentityProvider = PrInfo{1311, "helm", "FeIdentityProvider"}
+var prFeOnboarding = PrInfo{1307, "helm", "FeOnboarding"}
+var prFeSecurityAttributeProvider = PrInfo{1309, "helm", "FeSecurityAttributeProvider"}
+var prFeUsersAndRoles = PrInfo{1310, "helm", "FeUsersAndRoles"}
+var prIdentityProvider = PrInfo{913, "helm", "IdentityProvider"}
+var prKeycloakAuthenticator = PrInfo{915, "maven", "KeycloakAuthenticator"}
+var prOnboarding = PrInfo{770, "helm", "Onboarding"}
+var prSecurityAttributesProvider = PrInfo{861, "helm", "SecurityAttributesProvider"}
+var prSimplHttpClient = PrInfo{859, "helm", "SimplHttpClient"}
+var prTier1Authentication = PrInfo{1457, "helm", "Tier1Authentication"}
+var prTier1Gateway = PrInfo{772, "helm", "Tier1Gateway"}
+var prTier2Gateway = PrInfo{860, "helm", "Tier2Gateway"}
+var prTier2Proxy = PrInfo{1112, "helm", "Tier2Proxy"}
+var prUsersRoles = PrInfo{771, "helm", "UsersRoles"}
+var prChAuthority = PrInfo{1402, "helm", "ChAuthority"}
+var prChConsumer = PrInfo{1404, "helm", "ChConsumer"}
+var prChProvider = PrInfo{1403, "helm", "ChProvider"}
 
 var prIdsDemux = projectIdsDemux{
 	"microbe": {
@@ -153,6 +153,7 @@ type projectNameSvT map[string]PrInfo
 type PrInfo struct {
 	Id   int
 	Type string
+	Name string
 }
 
 func (p projectNameSvT) Get(key string) (PrInfo, bool) {
