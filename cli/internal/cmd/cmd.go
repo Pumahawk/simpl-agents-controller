@@ -1,6 +1,8 @@
 package cmd
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Command interface {
 	Name() string
@@ -40,5 +42,13 @@ func (g *Group) Run(args []string) error {
 		}
 		return fmt.Errorf("command %q not found", name)
 	}
+	printCommands(g.Cmds)
 	return fmt.Errorf("missing command name")
+}
+
+func printCommands(cmds []Command) {
+	fmt.Println("commands:")
+	for _, c := range cmds {
+		fmt.Println(c.Name())
+	}
 }
