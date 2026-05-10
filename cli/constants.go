@@ -1,5 +1,28 @@
 package main
 
+var prCommon = PrInfo{796, "helm"}
+var prAuthenticationProvider = PrInfo{939, "helm"}
+var prEidasKeycloak = PrInfo{1313, "helm"}
+var prEidasNode = PrInfo{1312, "helm"}
+var prFeAuthenticationProvider = PrInfo{1308, "helm"}
+var prFeIdentityProvider = PrInfo{1311, "helm"}
+var prFeOnboarding = PrInfo{1307, "helm"}
+var prFeSecurityAttributeProvider = PrInfo{1309, "helm"}
+var prFeUsersAndRoles = PrInfo{1310, "helm"}
+var prIdentityProvider = PrInfo{913, "helm"}
+var prKeycloakAuthenticator = PrInfo{915, "helm"}
+var prOnboarding = PrInfo{770, "helm"}
+var prSecurityAttributesProvider = PrInfo{861, "helm"}
+var prSimplHttpClient = PrInfo{859, "helm"}
+var prTier1Authentication = PrInfo{1457, "helm"}
+var prTier1Gateway = PrInfo{772, "helm"}
+var prTier2Gateway = PrInfo{860, "helm"}
+var prTier2Proxy = PrInfo{1112, "helm"}
+var prUsersRoles = PrInfo{771, "helm"}
+var prChAuthority = PrInfo{1402, "helm"}
+var prChConsumer = PrInfo{1404, "helm"}
+var prChProvider = PrInfo{1403, "helm"}
+
 var prIdsDemux = projectIdsDemux{
 	"microbe": {
 		"authentication-provider",
@@ -36,99 +59,105 @@ var prIdsDemux = projectIdsDemux{
 
 var prIds = projectNameSvT{
 	// Backend Common
-	"common": 796,
-	"cm":     796,
-	"com":    796,
+	"common": prCommon,
+	"cm":     prCommon,
+	"com":    prCommon,
 
 	// Backend Authentication provider
-	"authentication-provider": 939,
-	"auth":                    939,
+	"authentication-provider": prAuthenticationProvider,
+	"auth":                    prAuthenticationProvider,
 
 	// Plugin Eidas keycloak
-	"eidas-keycloak": 1313,
-	"eidas-k":        1313,
+	"eidas-keycloak": prEidasKeycloak,
+	"eidas-k":        prEidasKeycloak,
 
 	// Eidas Node
-	"eidas-node": 1312,
-	"eidas-n":    1312,
+	"eidas-node": prEidasNode,
+	"eidas-n":    prEidasNode,
 
 	// Frontend Authentication provider
-	"fe-authentication-provider": 1308,
-	"fe-auth":                    1308,
+	"fe-authentication-provider": prFeAuthenticationProvider,
+	"fe-auth":                    prFeAuthenticationProvider,
 
 	// Frontend Identity provider
-	"fe-identity-provider": 1311,
-	"fe-ide":               1311,
+	"fe-identity-provider": prFeIdentityProvider,
+	"fe-ide":               prFeIdentityProvider,
 
 	// Frontend Onboarding
-	"fe-onboarding": 1307,
-	"fe-onb":        1307,
+	"fe-onboarding": prFeOnboarding,
+	"fe-onb":        prFeOnboarding,
 
 	// Frontend Security attribute provider
-	"fe-security-attribute-provider": 1309,
-	"fe-sap":                         1309,
+	"fe-security-attribute-provider": prFeSecurityAttributeProvider,
+	"fe-sap":                         prFeSecurityAttributeProvider,
 
 	// Frontend Users and roles
-	"fe-users-and-roles": 1310,
-	"fe-usr":             1310,
+	"fe-users-and-roles": prFeUsersAndRoles,
+	"fe-usr":             prFeUsersAndRoles,
 
 	// Backend Identity provider
-	"identity-provider": 913,
-	"ide":               913,
+	"identity-provider": prIdentityProvider,
+	"ide":               prIdentityProvider,
 
 	// Plugin keycloak authenticator
-	"keycloak-authenticator": 915,
-	"k-auth":                 915,
+	"keycloak-authenticator": prKeycloakAuthenticator,
+	"k-auth":                 prKeycloakAuthenticator,
 
 	// Backend Onboarding
-	"onboarding": 770,
-	"onb":        770,
+	"onboarding": prOnboarding,
+	"onb":        prOnboarding,
 
 	// Backend Security attribute provider
-	"security-attributes-provider": 861,
-	"sap":                          861,
+	"security-attributes-provider": prSecurityAttributesProvider,
+	"sap":                          prSecurityAttributesProvider,
 
 	// Backend Lib Http client
-	"simpl-http-client": 859,
-	"http":              859,
+	"simpl-http-client": prSimplHttpClient,
+	"http":              prSimplHttpClient,
 
 	// Plugin Tier1 authenticator
-	"tier1-authentication": 1457,
-	"t1-auth":              1457,
+	"tier1-authentication": prTier1Authentication,
+	"t1-auth":              prTier1Authentication,
 
 	// Backend Tier1 gateway
-	"tier1-gateway": 772,
-	"t1g":           772,
+	"tier1-gateway": prTier1Gateway,
+	"t1g":           prTier1Gateway,
 
 	// Backend Tier2 gateway
-	"tier2-gateway": 860,
-	"t2g":           860,
+	"tier2-gateway": prTier2Gateway,
+	"t2g":           prTier2Gateway,
 
 	// Backend Tier2 proxy
-	"tier2-proxy": 1112,
-	"t2x":         1112,
+	"tier2-proxy": prTier2Proxy,
+	"t2x":         prTier2Proxy,
 
 	// Backend Users roles
-	"users-roles": 771,
-	"usr":         771,
+	"users-roles": prUsersRoles,
+	"usr":         prUsersRoles,
 
 	// Chart authority
-	"ch-authority": 1402,
-	"ch-auth":      1402,
+	"ch-authority": prChAuthority,
+	"ch-auth":      prChAuthority,
 
 	// Chart consumer
-	"ch-consumer": 1404,
-	"ch-con":      1404,
+	"ch-consumer": prChConsumer,
+	"ch-con":      prChConsumer,
 
 	// Chart consumer
-	"ch-provider": 1403,
-	"ch-pro":      1403,
+	"ch-provider": prChProvider,
+	"ch-pro":      prChProvider,
 }
 
-type projectNameSvT map[string]int
+type projectNameSvT map[string]PrInfo
 
-func (p projectNameSvT) Get(key string) int {
-	return p[key]
+type PrInfo struct {
+	Id   int
+	Type string
+}
+
+func (p projectNameSvT) Get(key string) (PrInfo, bool) {
+	pr, ok := p[key]
+	return pr, ok
 }
 
 type projectIdsDemux map[string][]string

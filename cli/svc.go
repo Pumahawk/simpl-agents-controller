@@ -16,7 +16,7 @@ type Version struct {
 	Stop      func()
 }
 
-func GetVersions(projectsIds []int) <-chan Version {
+func GetVersions(projectsInfo []PrInfo) <-chan Version {
 	var cversion <-chan Version
 	{
 		cv := make(chan Version)
@@ -24,7 +24,7 @@ func GetVersions(projectsIds []int) <-chan Version {
 		wg := &sync.WaitGroup{}
 		go func() {
 			defer close(cv)
-			for _, id := range projectsIds {
+			for _, info := range projectsInfo {
 				wg.Go(func() {
 					perpage := 100
 					ctx, ctxCanc := context.WithCancel(context.Background())
@@ -35,9 +35,9 @@ func GetVersions(projectsIds []int) <-chan Version {
 							return
 						default:
 						}
-						items, err := glclient.Packages(id, page, perpage)
+						items, err := glclient.Packages(info.Id, page, perpage)
 						if err != nil {
-							fmt.Fprintf(os.Stderr, "unable to retrieve projectId=%d", id)
+							fmt.Fprintf(os.Stderr, "unable to retrieve projectId=%d", info.Id)
 							return
 						}
 						if len(items) == 0 {
@@ -45,7 +45,7 @@ func GetVersions(projectsIds []int) <-chan Version {
 						}
 						for _, it := range items {
 							cv <- Version{
-								ProjectId: id,
+								ProjectId: info.Id,
 								Name:      it.Name,
 								Ref:       it.Pipeline.Ref,
 								Type:      it.PackageType,

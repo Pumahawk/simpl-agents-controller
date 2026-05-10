@@ -81,7 +81,7 @@ var LastVersionCmd = cmd.Cmd{
 			return fmt.Errorf("missing project id")
 		}
 
-		nums, err := getIds(projectIds)
+		nums, err := getPrsInfo(projectIds)
 		if err != nil {
 			return err
 		}
@@ -106,8 +106,8 @@ var LastVersionCmd = cmd.Cmd{
 
 func getId(idx string) (int, error) {
 	var id int
-	if ids := prIds.Get(idx); ids != 0 {
-		id = ids
+	if ids, ok := prIds.Get(idx); ok {
+		id = ids.Id
 	} else {
 		idx, err := strconv.ParseInt(idx, 10, 64)
 		if err != nil {
@@ -118,14 +118,14 @@ func getId(idx string) (int, error) {
 	return id, nil
 }
 
-func getIds(i []string) ([]int, error) {
-	str := make([]int, 0, len(i))
+func getPrsInfo(i []string) ([]PrInfo, error) {
+	str := make([]PrInfo, 0, len(i))
 	for _, nums := range i {
-		num, err := getId(nums)
-		if err != nil {
-			return nil, err
+		info, ok := prIds.Get(nums)
+		if !ok {
+			return nil, fmt.Errorf("unknown project %q", i)
 		}
-		str = append(str, int(num))
+		str = append(str, info)
 	}
 	return str, nil
 }
