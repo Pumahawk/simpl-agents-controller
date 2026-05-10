@@ -36,7 +36,8 @@ func (c *Client) Packages(id, page, perpage int) ([]PackageItem, error) {
 	rawUrl := c.BaseUrl +
 		"/api/v4/projects/" + url.PathEscape(strconv.Itoa(id)) +
 		"/packages?" +
-		"page=" + strconv.Itoa(page) +
+		"sort=desc" +
+		"&page=" + strconv.Itoa(page) +
 		"&perpage=" + strconv.Itoa(perpage)
 
 	res, err := http.Get(rawUrl)
