@@ -90,11 +90,11 @@ var LastVersionCmd = cmd.Cmd{
 		cv := GetVersions(nums)
 		w := newTabWriter()
 		find := make(map[int]int)
-		fmt.Fprintf(w, "Project\tName\tVersion\n")
+		fmt.Fprintf(w, "Project\tName\tRef\tVersion\n")
 		for v := range cv {
 			if v.Ref == ref && v.Type == v.PrInfo.Type && !regexp.MustCompile(`\.latest$`).MatchString(v.Version) {
 				if find[v.PrInfo.Id] < num {
-					fmt.Fprintf(w, "%d\t%q\t%q\n", v.PrInfo.Id, v.PrInfo.Name, v.Version)
+					fmt.Fprintf(w, "%d\t%q\t%q\t%q\n", v.PrInfo.Id, v.PrInfo.Name, v.Ref, v.Version)
 					find[v.PrInfo.Id]++
 				}
 				if find[v.PrInfo.Id] >= num {
