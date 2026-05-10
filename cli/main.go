@@ -20,6 +20,7 @@ var cmds cmd.Command = &cmd.Group{
 	Cmds: []cmd.Command{
 		&RegistryCmd,
 		&LastVersionCmd,
+		&UpdateVersionCmd,
 	},
 }
 

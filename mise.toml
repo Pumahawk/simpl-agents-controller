@@ -38,7 +38,7 @@
 env_shell_expand = false
 
 [shell_alias]
-cli = "mise run cli -- "
+cli = "mise run --raw -q cli --"
 
 [tools]
 kubectl = "1.34.1"
@@ -993,5 +993,15 @@ postgrest_restart
 
 [tasks."cli"]
 raw = true
-quiet = true
-run = "go -C cli run ."
+shell = "bash -ec"
+run = """
+if [ ! -f cli/cli ]; then
+  >&2 echo "cli not found. Build cli"
+  env -C cli go build -o cli .
+fi
+./cli/cli
+"""
+
+[tasks."cli:build"]
+shell = "bash -ec"
+run = "env -C cli go build ."
