@@ -1004,4 +1004,4 @@ fi
 
 [tasks."cli:build"]
 shell = "bash -ec"
-run = "env -C cli go build ."
+run = "env -C cli go build -o cli ."

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -15,7 +16,11 @@ var UpdateVersionCmd = cmd.Cmd{
 	CName: "update-version",
 	CRun: func(args []string) error {
 
-		ref := "main"
+		var ref string
+
+		fc := flag.NewFlagSet("", flag.ExitOnError)
+		fc.StringVar(&ref, "ref", "main", "")
+		fc.Parse(args)
 
 		type prinfopath struct {
 			authority    []string
