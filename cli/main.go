@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/Pumahawk/simpl-agents-controller/internal/cmd"
@@ -18,6 +19,7 @@ var glclient = gitlab.Client{
 var cmds cmd.Command = &cmd.Group{
 	Cmds: []cmd.Command{
 		&RegistryCmd,
+		&LastVersionCmd,
 	},
 }
 
@@ -63,4 +65,54 @@ var RegistryCmd = cmd.Cmd{
 		w.Flush()
 		return nil
 	},
+}
+
+var LastVersionCmd = cmd.Cmd{
+	CName: "last-version",
+	CRun: func(args []string) error {
+		var ref, typ string
+		fs := flag.NewFlagSet("", flag.ExitOnError)
+		fs.StringVar(&ref, "ref", "main", "")
+		fs.StringVar(&typ, "type", "helm", "")
+		fs.Parse(args)
+
+		projectIds := fs.Args()
+
+		if len(projectIds) == 0 {
+			return fmt.Errorf("missing project id")
+		}
+
+		nums, err := toInt(projectIds)
+		if err != nil {
+			return err
+		}
+
+		cv := GetVersions(nums)
+		w := tabwriter.NewWriter(os.Stdout, 1, 2, 1, ' ', 0)
+		find := make(map[int]bool)
+		fmt.Fprintf(w, "Project\tVersion\n")
+		for v := range cv {
+			if v.Ref == ref && v.Type == typ && !strings.Contains(v.Version, "latest") {
+				if !find[v.ProjectId] {
+					fmt.Fprintf(w, "%d\t%q\n", v.ProjectId, v.Version)
+					find[v.ProjectId] = true
+					v.Stop()
+				}
+			}
+		}
+		w.Flush()
+		return nil
+	},
+}
+
+func toInt(i []string) ([]int, error) {
+	str := make([]int, 0, len(i))
+	for _, nums := range i {
+		num, err := strconv.ParseInt(nums, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		str = append(str, int(num))
+	}
+	return str, nil
 }
