@@ -43,7 +43,7 @@ func (g *Group) Run(args []string) error {
 		return fmt.Errorf("command %q not found", name)
 	}
 	printCommands(g.Cmds)
-	return fmt.Errorf("missing command name")
+	return nil
 }
 
 func printCommands(cmds []Command) {

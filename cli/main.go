@@ -40,12 +40,11 @@ var RegistryCmd = cmd.Cmd{
 		fs.IntVar(&perpage, "perpage", 10, "")
 		fs.Parse(args)
 
-		ids := fs.Arg(0)
-		if ids == "" {
+		if len(fs.Args()) == 0 {
 			return fmt.Errorf("missing project id")
 		}
 
-		id, err := strconv.ParseInt(ids, 10, 64)
+		id, err := getId(fs.Arg(0))
 		if err != nil {
 			return err
 		}
@@ -55,11 +54,11 @@ var RegistryCmd = cmd.Cmd{
 			return err
 		}
 
-		w := tabwriter.NewWriter(os.Stdout, 1, 2, 1, ' ', 0)
+		w := newTabWriter()
 		fmt.Fprintf(w, "Id\tName\tVersion\tType\tPipelineId\tRef\tPipeline WebUrl\n")
 		for i := range items {
 			item := items[i]
-			fmt.Fprintf(w, "%d \t %q \t %q \t %q \t %d \t %q \t %q\n",
+			fmt.Fprintf(w, "%d\t%q\t%q\t%q\t%d\t%q\t%q\n",
 				item.Id, item.Name, item.Version, item.PackageType, item.Pipeline.Id, item.Pipeline.Ref, item.Pipeline.WebUrl)
 		}
 		w.Flush()
@@ -76,25 +75,25 @@ var LastVersionCmd = cmd.Cmd{
 		fs.StringVar(&typ, "type", "helm", "")
 		fs.Parse(args)
 
-		projectIds := fs.Args()
+		projectIds := prIdsDemux.Demux(fs.Args())
 
 		if len(projectIds) == 0 {
 			return fmt.Errorf("missing project id")
 		}
 
-		nums, err := toInt(projectIds)
+		nums, err := getIds(projectIds)
 		if err != nil {
 			return err
 		}
 
 		cv := GetVersions(nums)
-		w := tabwriter.NewWriter(os.Stdout, 1, 2, 1, ' ', 0)
+		w := newTabWriter()
 		find := make(map[int]bool)
-		fmt.Fprintf(w, "Project\tVersion\n")
+		fmt.Fprintf(w, "Project\tName\tVersion\n")
 		for v := range cv {
 			if v.Ref == ref && v.Type == typ && !strings.Contains(v.Version, "latest") {
 				if !find[v.ProjectId] {
-					fmt.Fprintf(w, "%d\t%q\n", v.ProjectId, v.Version)
+					fmt.Fprintf(w, "%d\t%q\t%q\n", v.ProjectId, v.Name, v.Version)
 					find[v.ProjectId] = true
 					v.Stop()
 				}
@@ -105,14 +104,32 @@ var LastVersionCmd = cmd.Cmd{
 	},
 }
 
-func toInt(i []string) ([]int, error) {
+func getId(idx string) (int, error) {
+	var id int
+	if ids := prIds.Get(idx); ids != 0 {
+		id = ids
+	} else {
+		idx, err := strconv.ParseInt(idx, 10, 64)
+		if err != nil {
+			return 0, err
+		}
+		id = int(idx)
+	}
+	return id, nil
+}
+
+func getIds(i []string) ([]int, error) {
 	str := make([]int, 0, len(i))
 	for _, nums := range i {
-		num, err := strconv.ParseInt(nums, 10, 64)
+		num, err := getId(nums)
 		if err != nil {
 			return nil, err
 		}
 		str = append(str, int(num))
 	}
 	return str, nil
+}
+
+func newTabWriter() *tabwriter.Writer {
+	return tabwriter.NewWriter(os.Stdout, 1, 2, 3, ' ', 0)
 }
