@@ -70,7 +70,9 @@ var LastVersionCmd = cmd.Cmd{
 	CName: "last-version",
 	CRun: func(args []string) error {
 		var ref string
+		var num int
 		fs := flag.NewFlagSet("", flag.ExitOnError)
+		fs.IntVar(&num, "num", 1, "")
 		fs.StringVar(&ref, "ref", "main", "")
 		fs.Parse(args)
 
@@ -87,14 +89,17 @@ var LastVersionCmd = cmd.Cmd{
 
 		cv := GetVersions(nums)
 		w := newTabWriter()
-		find := make(map[int]bool)
+		find := make(map[int]int)
 		fmt.Fprintf(w, "Project\tName\tVersion\n")
 		for v := range cv {
 			if v.Ref == ref && v.Type == v.PrInfo.Type && !regexp.MustCompile(`\.latest$`).MatchString(v.Version) {
-				if !find[v.PrInfo.Id] {
+				if find[v.PrInfo.Id] < num {
 					fmt.Fprintf(w, "%d\t%q\t%q\n", v.PrInfo.Id, v.PrInfo.Name, v.Version)
-					find[v.PrInfo.Id] = true
+					find[v.PrInfo.Id]++
+				}
+				if find[v.PrInfo.Id] >= num {
 					v.Stop()
+
 				}
 			}
 		}
