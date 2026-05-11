@@ -93,10 +93,10 @@ var UpdateVersionCmd = cmd.Cmd{
 			yamlObjs[f] = &yamlSt{f, obj}
 		}
 
-		yamlObjFiles := make(map[PrInfo]string)
+		yamlObjFiles := make(map[PrInfo][]string)
 		for f, v := range conf {
 			for info := range v {
-				yamlObjFiles[info] = f
+				yamlObjFiles[info] = append(yamlObjFiles[info], f)
 			}
 		}
 
@@ -115,14 +115,18 @@ var UpdateVersionCmd = cmd.Cmd{
 			if !find[v.PrInfo.Id] && v.Ref == ref && !regexp.MustCompile(`\.latest$`).MatchString(v.Version) {
 				find[v.PrInfo.Id] = true
 				v.Stop()
-				obj, ok := yamlObjs[yamlObjFiles[v.PrInfo]]
+				for _, fl := range yamlObjFiles[v.PrInfo]{
+				obj, ok := yamlObjs[fl]
 				if ok {
 					path, ok := conf[obj.file][v.PrInfo]
 					if ok {
-						if _, err := obj.obj.UpdateAttribute(v.Version, path...); err != nil {
+						if ok, err := obj.obj.UpdateAttribute(v.Version, path...); err != nil {
 							return fmt.Errorf("unable to update file=%q path=%q", obj.file, strings.Join(path, "."))
+						} else if !ok {
+							fmt.Fprintf(os.Stderr, "unable to update file=%q %q version %q\n", obj.file, v.PrInfo.Name, v.Version)
 						}
 					}
+				}
 				}
 			}
 		}

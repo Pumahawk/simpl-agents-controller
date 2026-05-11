@@ -1,27 +1,27 @@
 package main
 
-var prAuthenticationProvider = PrInfo{939, "helm", "AuthenticationProvider"}
-var prChAuthority = PrInfo{1402, "helm", "ChAuthority"}
-var prChConsumer = PrInfo{1404, "helm", "ChConsumer"}
-var prChProvider = PrInfo{1403, "helm", "ChProvider"}
-var prCommon = PrInfo{796, "maven", "Common"}
-var prEidasKeycloak = PrInfo{1313, "maven", "EidasKeycloak"}
-var prEidasNode = PrInfo{1312, "helm", "EidasNode"}
-var prFeAuthenticationProvider = PrInfo{1308, "helm", "FeAuthenticationProvider"}
-var prFeIdentityProvider = PrInfo{1311, "helm", "FeIdentityProvider"}
-var prFeOnboarding = PrInfo{1307, "helm", "FeOnboarding"}
-var prFeSecurityAttributeProvider = PrInfo{1309, "helm", "FeSecurityAttributeProvider"}
-var prFeUsersAndRoles = PrInfo{1310, "helm", "FeUsersAndRoles"}
-var prIdentityProvider = PrInfo{913, "helm", "IdentityProvider"}
-var prKeycloakAuthenticator = PrInfo{915, "maven", "KeycloakAuthenticator"}
-var prOnboarding = PrInfo{770, "helm", "Onboarding"}
-var prSecurityAttributesProvider = PrInfo{861, "helm", "SecurityAttributesProvider"}
-var prSimplHttpClient = PrInfo{859, "helm", "SimplHttpClient"}
-var prTier1Authentication = PrInfo{1457, "helm", "Tier1Authentication"}
-var prTier1Gateway = PrInfo{772, "helm", "Tier1Gateway"}
-var prTier2Gateway = PrInfo{860, "helm", "Tier2Gateway"}
-var prTier2Proxy = PrInfo{1112, "helm", "Tier2Proxy"}
-var prUsersRoles = PrInfo{771, "helm", "UsersRoles"}
+var prAuthenticationProvider = PrInfo{939, "helm", "authentication-provider"}
+var prChAuthority = PrInfo{1402, "helm", "ch-authority"}
+var prChConsumer = PrInfo{1404, "helm", "ch-consumer"}
+var prChProvider = PrInfo{1403, "helm", "ch-provider"}
+var prCommon = PrInfo{796, "maven", "common"}
+var prEidasKeycloak = PrInfo{1313, "maven", "eidas-keycloak"}
+var prEidasNode = PrInfo{1312, "helm", "eidas-node"}
+var prFeAuthenticationProvider = PrInfo{1308, "helm", "fe-authentication-provider"}
+var prFeIdentityProvider = PrInfo{1311, "helm", "fe-identity-provider"}
+var prFeOnboarding = PrInfo{1307, "helm", "fe-onboarding"}
+var prFeSecurityAttributeProvider = PrInfo{1309, "helm", "fe-security-attribute-provider"}
+var prFeUsersAndRoles = PrInfo{1310, "helm", "fe-users-and-roles"}
+var prIdentityProvider = PrInfo{913, "helm", "identity-provider"}
+var prKeycloakAuthenticator = PrInfo{915, "maven", "keycloak-authenticator"}
+var prOnboarding = PrInfo{770, "helm", "onboarding"}
+var prSecurityAttributesProvider = PrInfo{861, "helm", "security-attributes-provider"}
+var prSimplHttpClient = PrInfo{859, "helm", "simpl-http-client"}
+var prTier1Authentication = PrInfo{1457, "helm", "tier1-authentication"}
+var prTier1Gateway = PrInfo{772, "helm", "tier1-gateway"}
+var prTier2Gateway = PrInfo{860, "helm", "tier2-gateway"}
+var prTier2Proxy = PrInfo{1112, "helm", "tier2-proxy"}
+var prUsersRoles = PrInfo{771, "helm", "users-roles"}
 
 var prIdsDemux = projectIdsDemux{
 	"microbe": {

@@ -15,29 +15,27 @@ type Obj struct {
 func (o *Obj) UpdateAttribute(value string, path ...string) (bool, error) {
 	deep := 0
 	for i, line := range o.lines {
-		if deep < len(path) {
-			s := strings.Repeat(" ", deep*2)
-			rx := "^" + s + path[deep] + ":"
-			r, err := regexp.Compile(rx)
-			if err != nil {
-				return false, err
-			}
-			if r.MatchString(line) {
-				deep++
-				if deep == len(path) {
-					loc := regexp.MustCompile(rx).FindStringIndex(line)
-					if loc == nil {
-						return false, fmt.Errorf("unexpected not match regex=%q, line=%q", rx, line)
-					}
-					o.lines[i] = fmt.Sprintf("%s %q", string(line[loc[0]:loc[1]]), value)
-					return true, nil
+		s := strings.Repeat(" ", deep*2)
+		rx := "^" + s + path[deep] + ":"
+		r, err := regexp.Compile(rx)
+		if err != nil {
+			return false, err
+		}
+		if r.MatchString(line) {
+			deep++
+			if deep == len(path) {
+				loc := regexp.MustCompile(rx).FindStringIndex(line)
+				if loc == nil {
+					return false, fmt.Errorf("unexpected not match regex=%q, line=%q", rx, line)
 				}
-			} else {
-				if deep > 0 {
-					s := strings.Repeat(" ", (deep-1)*2)
-					if !regexp.MustCompile("^" + s).MatchString(line) {
-						deep--
-					}
+				o.lines[i] = fmt.Sprintf("%s %s", string(line[loc[0]:loc[1]]), value)
+				return true, nil
+			}
+		} else {
+			if deep > 0 {
+				s := strings.Repeat(" ", (deep-1)*2+1)
+				if !regexp.MustCompile("^" + s).MatchString(line) {
+					deep--
 				}
 			}
 		}
