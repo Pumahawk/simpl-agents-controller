@@ -1,7 +1,10 @@
 package main
 
-var prCommon = PrInfo{796, "maven", "Common"}
 var prAuthenticationProvider = PrInfo{939, "helm", "AuthenticationProvider"}
+var prChAuthority = PrInfo{1402, "helm", "ChAuthority"}
+var prChConsumer = PrInfo{1404, "helm", "ChConsumer"}
+var prChProvider = PrInfo{1403, "helm", "ChProvider"}
+var prCommon = PrInfo{796, "maven", "Common"}
 var prEidasKeycloak = PrInfo{1313, "maven", "EidasKeycloak"}
 var prEidasNode = PrInfo{1312, "helm", "EidasNode"}
 var prFeAuthenticationProvider = PrInfo{1308, "helm", "FeAuthenticationProvider"}
@@ -19,9 +22,6 @@ var prTier1Gateway = PrInfo{772, "helm", "Tier1Gateway"}
 var prTier2Gateway = PrInfo{860, "helm", "Tier2Gateway"}
 var prTier2Proxy = PrInfo{1112, "helm", "Tier2Proxy"}
 var prUsersRoles = PrInfo{771, "helm", "UsersRoles"}
-var prChAuthority = PrInfo{1402, "helm", "ChAuthority"}
-var prChConsumer = PrInfo{1404, "helm", "ChConsumer"}
-var prChProvider = PrInfo{1403, "helm", "ChProvider"}
 
 var prIdsDemux = projectIdsDemux{
 	"microbe": {

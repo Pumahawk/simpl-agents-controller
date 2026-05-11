@@ -40,10 +40,44 @@ var UpdateVersionCmd = cmd.Cmd{
 
 		conf := map[string]map[PrInfo][]string{
 			"simpl-repo/authority-iaa/charts/values.yaml": {
-				prAuthenticationProvider: {"auth_provider", "targetRevision"},
+				prAuthenticationProvider:      {"auth_provider", "targetRevision"},
+				prEidasKeycloak:               {"keycloak", "eidas_demo_keycloak_extension", "targetRevision"},
+				prFeAuthenticationProvider:    {"fe_auth_provider", "targetRevision"},
+				prFeIdentityProvider:          {"fe_identity_provider", "targetRevision"},
+				prFeOnboarding:                {"fe_onboarding", "targetRevision"},
+				prFeSecurityAttributeProvider: {"fe_security_attribute_provider", "targetRevision"},
+				prFeUsersAndRoles:             {"fe_users_roles", "targetRevision"},
+				prIdentityProvider:            {"identity_provider", "targetRevision"},
+				prKeycloakAuthenticator:       {"keycloak", "keycloak_authenticator", "targetRevision"},
+				prOnboarding:                  {"onboarding", "targetRevision"},
+				prSecurityAttributesProvider:  {"sap", "targetRevision"},
+				prTier1Gateway:                {"tier1_gateway", "targetRevision"},
+				prTier2Gateway:                {"tier2_gateway", "targetRevision"},
+				prTier2Proxy:                  {"tier2_proxy", "targetRevision"},
+				prUsersRoles:                  {"users_roles", "targetRevision"},
 			},
-			"simpl-repo/consumer-iaa/charts/values.yaml": {},
-			"simpl-repo/provider-iaa/charts/values.yaml": {},
+			"simpl-repo/consumer-iaa/charts/values.yaml": {
+				prAuthenticationProvider:   {"auth_provider", "targetRevision"},
+				prFeAuthenticationProvider: {"auth_provider_fe", "targetRevision"},
+				prFeAuthenticationProvider: {"authentication_provider_fe", "targetRevision"},
+				prFeUsersAndRoles:          {"users_roles_fe", "targetRevision"},
+				prKeycloakAuthenticator:    {"keycloak", "keycloak_authenticator", "targetRevision"},
+				prTier1Gateway:             {"tier1_gateway", "targetRevision"},
+				prTier2Gateway:             {"tier2_gateway", "targetRevision"},
+				prTier2Proxy:               {"tier2_proxy", "targetRevision"},
+				prUsersRoles:               {"users_roles", "targetRevision"},
+			},
+			"simpl-repo/provider-iaa/charts/values.yaml": {
+				prAuthenticationProvider:   {"auth_provider", "targetRevision"},
+				prFeAuthenticationProvider: {"auth_provider_fe", "targetRevision"},
+				prFeAuthenticationProvider: {"authentication_provider_fe", "targetRevision"},
+				prFeUsersAndRoles:          {"users_roles_fe", "targetRevision"},
+				prKeycloakAuthenticator:    {"keycloak", "keycloak_authenticator", "targetRevision"},
+				prTier1Gateway:             {"tier1_gateway", "targetRevision"},
+				prTier2Gateway:             {"tier2_gateway", "targetRevision"},
+				prTier2Proxy:               {"tier2_proxy", "targetRevision"},
+				prUsersRoles:               {"users_roles", "targetRevision"},
+			},
 		}
 
 		type yamlSt struct {
