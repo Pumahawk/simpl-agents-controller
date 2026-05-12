@@ -33,7 +33,7 @@ func main() {
 }
 
 var RegistryCmd = cmd.Cmd{
-	CName: "registry",
+	CName: "registry:get",
 	CRun: func(args []string) error {
 		var page, perpage int
 		fs := flag.NewFlagSet("", flag.ExitOnError)
@@ -68,7 +68,7 @@ var RegistryCmd = cmd.Cmd{
 }
 
 var LastVersionCmd = cmd.Cmd{
-	CName: "last-version",
+	CName: "versions:get",
 	CRun: func(args []string) error {
 		var ref string
 		var num int

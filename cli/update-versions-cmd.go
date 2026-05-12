@@ -15,7 +15,7 @@ import (
 )
 
 var UpdateVersionCmd = cmd.Cmd{
-	CName: "update-version",
+	CName: "versions:update",
 	CRun: func(args []string) error {
 
 		var ref string
