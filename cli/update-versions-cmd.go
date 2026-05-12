@@ -23,6 +23,7 @@ var UpdateVersionCmd = cmd.Cmd{
 		fc := flag.NewFlagSet("", flag.ExitOnError)
 		fc.StringVar(&ref, "ref", "main", "")
 		fc.Parse(args)
+		projects := prIdsDemux.Demux(fc.Args())
 
 		readYamlFile := func(ph string) (*yaml.Obj, error) {
 			f, err := os.Open(ph)
@@ -96,17 +97,30 @@ var UpdateVersionCmd = cmd.Cmd{
 		yamlObjFiles := make(map[PrInfo][]string)
 		for f, v := range conf {
 			for info := range v {
+				if len(projects) > 0 {
+					if !slices.ContainsFunc(projects, func(id string) bool {
+						if i, ok := prIds.Get(id); ok {
+							return i == info
+						} else {
+							return false
+						}
+					}) {
+						continue
+					}
+				}
 				yamlObjFiles[info] = append(yamlObjFiles[info], f)
 			}
 		}
 
 		mapk := make([]PrInfo, 0)
-		for _, v := range conf {
-			for info := range v {
-				if !slices.Contains(mapk, info) {
-					mapk = append(mapk, info)
-				}
+		for info := range yamlObjFiles {
+			if !slices.Contains(mapk, info) {
+				mapk = append(mapk, info)
 			}
+		}
+
+		if len(mapk) == 0 {
+			return fmt.Errorf("no project selected")
 		}
 
 		find := make(map[int]bool)
@@ -115,18 +129,18 @@ var UpdateVersionCmd = cmd.Cmd{
 			if !find[v.PrInfo.Id] && v.Ref == ref && !regexp.MustCompile(`\.latest$`).MatchString(v.Version) {
 				find[v.PrInfo.Id] = true
 				v.Stop()
-				for _, fl := range yamlObjFiles[v.PrInfo]{
-				obj, ok := yamlObjs[fl]
-				if ok {
-					path, ok := conf[obj.file][v.PrInfo]
+				for _, fl := range yamlObjFiles[v.PrInfo] {
+					obj, ok := yamlObjs[fl]
 					if ok {
-						if ok, err := obj.obj.UpdateAttribute(v.Version, path...); err != nil {
-							return fmt.Errorf("unable to update file=%q path=%q", obj.file, strings.Join(path, "."))
-						} else if !ok {
-							fmt.Fprintf(os.Stderr, "unable to update file=%q %q version %q\n", obj.file, v.PrInfo.Name, v.Version)
+						path, ok := conf[obj.file][v.PrInfo]
+						if ok {
+							if ok, err := obj.obj.UpdateAttribute(v.Version, path...); err != nil {
+								return fmt.Errorf("unable to update file=%q path=%q", obj.file, strings.Join(path, "."))
+							} else if !ok {
+								fmt.Fprintf(os.Stderr, "unable to update file=%q %q version %q\n", obj.file, v.PrInfo.Name, v.Version)
+							}
 						}
 					}
-				}
 				}
 			}
 		}
