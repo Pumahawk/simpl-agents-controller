@@ -745,7 +745,7 @@ environment_remote_update() {
 #      mise run argo:copy_parameters "${K_NAME/test/dev}" "$K_NAME" && mise run argo:sync "$K_NAME"
 #    ;;
     iaadsstaging*)
-      VERSION_GREP_ARGS=(-v -e SNAPSHOT -e latest -e feature-)
+      VERSION_GREP_ARGS=(-v -e SNAPSHOT -e hotfix -e latest -e feature-)
       mise run argo:update_and_sync_by_namespace "$K_NAME" "${VERSION_GREP_ARGS[@]}"
     ;;
     *)
