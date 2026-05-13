@@ -1005,3 +1005,11 @@ fi
 [tasks."cli:build"]
 shell = "bash -ec"
 run = "env -C cli go build -o cli ."
+
+[tasks."versions:get"]
+shell = "bash -ec"
+run = "mise run --quiet --raw cli -- versions:get"
+
+[tasks."versions:update"]
+shell = "bash -ec"
+run = "mise run --quiet --raw cli -- versions:update"
