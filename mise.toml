@@ -39,6 +39,7 @@ env_shell_expand = false
 
 [shell_alias]
 cli = "mise run --raw -q cli --"
+vers = "mise run --raw -q cli -- versions:get"
 
 [tools]
 kubectl = "1.34.1"
