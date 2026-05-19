@@ -343,16 +343,16 @@ clear_agent() {
     echo "Not found jobs to delete"
   fi
 
-  echo "Sync with argocd the deployer and the final chart"
-  mise run argo:cli  app sync --prune "$DEPLOYER_NAME"
-  mise run argo:cli  app sync --prune "$K_NAMESPACE"
-
   echo "Scale to 1 deployments and statefulset"
   if [ -n "$scalelist" ]; then
     kubectl scale --replicas 1 -n $K_NAMESPACE  "${scalelist[@]}"
   else
     echo "Not deployments or statefulset to scale"
   fi
+
+  echo "Sync with argocd the deployer and the final chart"
+  mise run argo:cli  app sync --prune "$DEPLOYER_NAME"
+  mise run argo:cli  app sync --prune "$K_NAMESPACE"
 }
 clear_agent
 """
