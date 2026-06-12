@@ -172,10 +172,10 @@ main
 """
 
 [tasks."cluster:db:exec"]
-run = "kubectl exec -n common01 pg-cluster-2 -- psql -U postgres"
+run = "kubectl exec -n common01 pg-cluster-0 -- psql -U postgres"
 
 [tasks."cluster:db:connect"]
-run = "kubectl exec -it -n common01 pg-cluster-2 -- psql -U postgres"
+run = "kubectl exec -it -n common01 pg-cluster-0 -- psql -U postgres"
 
 [tasks."cluster:db:get_connections_by_user"]
 shell = "bash -ec"
@@ -295,6 +295,25 @@ get_secrets() {
 get_secrets
 """
 
+[tasks."db:size"]
+shell = "bash -ec"
+run = """
+ mise run cluster:db:exec -c 'SELECT
+	    datname AS database,
+	    pg_size_pretty(pg_database_size(datname)) AS size
+	FROM pg_database
+	ORDER BY pg_database_size(datname) DESC;'
+"""
+
+[tasks."db:size_total"]
+shell = "bash -ec"
+run = """
+mise run cluster:db:exec -c '
+	SELECT pg_size_pretty(SUM(pg_database_size(datname))) AS total_database
+	FROM pg_database;
+'
+"""
+
 [tasks."db:clear_agent"]
 shell = "bash -ec"
 run = """
@@ -338,7 +357,7 @@ clear_agent() {
   echo "Delete all jobs"
   readarray -t jobslist < <(kubectl -n "$K_NAMESPACE" get job -oname)
   if [ -n "$jobslist" ]; then
-    kubectl -n "$K_NAMESPACE" delete  "${jobslist[@]}" || true
+    kubectl -n "$K_NAMESPACE" delete -f  "${jobslist[@]}" || true
   else
     echo "Not found jobs to delete"
   fi
@@ -759,22 +778,19 @@ environment_remote_update
 
 [tasks."environment:remote_update_all"]
 run = """
-mise run \\
-    environment:remote_update iaadsdevauthority \\
-::: environment:remote_update iaadsdevconsumer \\
-::: environment:remote_update iaadsdevdataprovider \\
-::: environment:remote_update iaadsstagingauthority \\
-::: environment:remote_update iaadsstagingconsumer \\
-::: environment:remote_update iaadsstagingdataprovider \\
-::: environment:remote_update iaadstestauthority \\
-::: environment:remote_update iaadstestconsumer \\
-::: environment:remote_update iaadstestdataprovider \\
-::: environment:remote_update authority-iaa-01 \\
-::: environment:remote_update consumer-iaa-01 \\
-::: environment:remote_update provider-iaa-01 \\
-::: environment:remote_update iaadsautomationauthority \\
-::: environment:remote_update iaadsautomationconsumer \\
-::: environment:remote_update iaadsautomationdataprovider
+timeout 10m mise run environment:remote_update iaadsdevauthority &
+timeout 10m mise run environment:remote_update iaadsdevconsumer &
+timeout 10m mise run environment:remote_update iaadsdevdataprovider &
+timeout 10m mise run environment:remote_update iaadstestauthority &
+timeout 10m mise run environment:remote_update iaadstestconsumer &
+timeout 10m mise run environment:remote_update iaadstestdataprovider &
+timeout 10m mise run environment:remote_update authority-iaa-01 &
+timeout 10m mise run environment:remote_update consumer-iaa-01 &
+timeout 10m mise run environment:remote_update provider-iaa-01 &
+timeout 10m mise run environment:remote_update iaadsautomationauthority &
+timeout 10m mise run environment:remote_update iaadsautomationconsumer &
+timeout 10m mise run environment:remote_update iaadsautomationdataprovider &
+wait
 """
 
 [tasks."environment:remote_update_tests"]
