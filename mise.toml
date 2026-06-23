@@ -746,7 +746,7 @@ environment_remote_update() {
 #   iaadsstaging*)
 #     VERSION_GREP_ARGS=(-v -e SNAPSHOT -e hotfix -e latest -e feature-)
 #     mise run argo:update_and_sync_by_namespace "$K_NAME" "${VERSION_GREP_ARGS[@]}"
-    ;;
+#   ;;
     *)
       echo "Unsupported automatic update for environment $K_NAME"
     ;;
