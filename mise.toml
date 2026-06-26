@@ -759,17 +759,17 @@ environment_remote_update() {
   local K_NAME="${1?Missing namespace}"
   local VERSION_GREP_ARGS=( -v -e latest )
   case "$K_NAME" in
-    iaadsstaging*|iaadstest*|*01*|iaadsautomation*|iaadsdev*)
+    iaadstest*|*01*|iaadsautomation*|iaadsdev*)
       VERSION_GREP_ARGS=(-P '^(?=.*SNAPSHOT)(?!.*latest).*')
       mise run argo:update_and_sync_by_namespace "$K_NAME" "${VERSION_GREP_ARGS[@]}"
       ;;
 #    iaadstest*)
 #      mise run argo:copy_parameters "${K_NAME/test/dev}" "$K_NAME" && mise run argo:sync "$K_NAME"
 #    ;;
-#   iaadsstaging*)
-#     VERSION_GREP_ARGS=(-v -e SNAPSHOT -e hotfix -e latest -e feature-)
-#     mise run argo:update_and_sync_by_namespace "$K_NAME" "${VERSION_GREP_ARGS[@]}"
-#   ;;
+    iaadsstaging*)
+      VERSION_GREP_ARGS=(-v -e SNAPSHOT -e hotfix -e latest -e feature-)
+      mise run argo:update_and_sync_by_namespace "$K_NAME" "${VERSION_GREP_ARGS[@]}"
+    ;;
     *)
       echo "Unsupported automatic update for environment $K_NAME"
     ;;
