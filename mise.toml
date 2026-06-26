@@ -1035,3 +1035,9 @@ run = "mise run --quiet --raw cli -- versions:get"
 [tasks."versions:update"]
 shell = "bash -ec"
 run = "mise run --quiet --raw cli -- versions:update"
+
+[tasks."argo:versions"]
+shell = "bash -ec"
+run = """
+kubectl get -nargocd application  -oyaml | yq '.items[]  | "\\(.metadata.name) \\(.spec.source.targetRevision)"' |  grep -e -deployer
+"""
