@@ -707,7 +707,6 @@ mise run \\
 ::: argo:sync authority-iaa-01 \\
 ::: argo:sync consumer-iaa-01 \\
 ::: argo:sync provider-iaa-01 \\
-::: argo:sync iaadsstagingauthority \\
 ::: argo:sync iaadsstagingconsumer \\
 ::: argo:sync iaadsstagingdataprovider \\
 ::: argo:sync iaadsautomationauthority \\
@@ -760,17 +759,17 @@ environment_remote_update() {
   local K_NAME="${1?Missing namespace}"
   local VERSION_GREP_ARGS=( -v -e latest )
   case "$K_NAME" in
-    iaadstest*|*01*|iaadsautomation*|iaadsdev*)
+    iaadsstaging*|iaadstest*|*01*|iaadsautomation*|iaadsdev*)
       VERSION_GREP_ARGS=(-P '^(?=.*SNAPSHOT)(?!.*latest).*')
       mise run argo:update_and_sync_by_namespace "$K_NAME" "${VERSION_GREP_ARGS[@]}"
       ;;
 #    iaadstest*)
 #      mise run argo:copy_parameters "${K_NAME/test/dev}" "$K_NAME" && mise run argo:sync "$K_NAME"
 #    ;;
-    iaadsstaging*)
-      VERSION_GREP_ARGS=(-v -e SNAPSHOT -e hotfix -e latest -e feature-)
-      mise run argo:update_and_sync_by_namespace "$K_NAME" "${VERSION_GREP_ARGS[@]}"
-    ;;
+#   iaadsstaging*)
+#     VERSION_GREP_ARGS=(-v -e SNAPSHOT -e hotfix -e latest -e feature-)
+#     mise run argo:update_and_sync_by_namespace "$K_NAME" "${VERSION_GREP_ARGS[@]}"
+#   ;;
     *)
       echo "Unsupported automatic update for environment $K_NAME"
     ;;
@@ -784,6 +783,9 @@ run = """
 timeout 10m mise run environment:remote_update iaadsdevauthority &
 timeout 10m mise run environment:remote_update iaadsdevconsumer &
 timeout 10m mise run environment:remote_update iaadsdevdataprovider &
+timeout 10m mise run environment:remote_update iaadsstagingauthority &
+timeout 10m mise run environment:remote_update iaadsstagingconsumer &
+timeout 10m mise run environment:remote_update iaadsstagingdataprovider &
 timeout 10m mise run environment:remote_update iaadstestauthority &
 timeout 10m mise run environment:remote_update iaadstestconsumer &
 timeout 10m mise run environment:remote_update iaadstestdataprovider &
