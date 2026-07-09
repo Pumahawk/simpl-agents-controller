@@ -651,6 +651,7 @@ helm,tier2_gateway,860
 helm,identity_provider,913
 helm,auth_provider,939
 helm,tier2_proxy,1112
+helm,consent_management,1723
 jar,keycloak_authenticator,915/packages/maven/eu/europa/ec/simpl/keycloak-authenticator
 jar,eidas_demo_keycloak_extension,1313/packages/maven/eu/europa/ec/simpl/eidas-demo-keycloak-extension
 EOF
