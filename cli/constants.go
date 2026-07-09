@@ -5,6 +5,7 @@ var prChAuthority = PrInfo{1402, "helm", "ch-authority"}
 var prChConsumer = PrInfo{1404, "helm", "ch-consumer"}
 var prChProvider = PrInfo{1403, "helm", "ch-provider"}
 var prCommon = PrInfo{796, "maven", "common"}
+var prConsentManagementBe = PrInfo{1723, "helm", "consent-management-be"}
 var prEidasKeycloak = PrInfo{1313, "maven", "eidas-keycloak"}
 var prEidasNode = PrInfo{1312, "helm", "eidas-node"}
 var prFeAuthenticationProvider = PrInfo{1308, "helm", "fe-authentication-provider"}
@@ -32,6 +33,7 @@ var prIdsDemux = projectIdsDemux{
 		"tier1-gateway",
 		"tier2-gateway",
 		"users-roles",
+		"consent-management-be",
 	},
 	"microfe": {
 		"fe-authentication-provider",
@@ -70,6 +72,10 @@ var prIds = projectNameSvT{
 	// Plugin Eidas keycloak
 	"eidas-keycloak": prEidasKeycloak,
 	"eidas-k":        prEidasKeycloak,
+
+	// Consent Management Be
+	"consent-management-be": prConsentManagementBe,
+	"cmb":                   prConsentManagementBe,
 
 	// Eidas Node
 	"eidas-node": prEidasNode,
