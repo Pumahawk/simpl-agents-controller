@@ -71,6 +71,7 @@ var UpdateVersionCmd = cmd.Cmd{
 			"simpl-repo/provider-iaa/charts/values.yaml": {
 				prAuthenticationProvider:   {"auth_provider", "targetRevision"},
 				prConsentManagementBe:      {"consent_management", "targetRevision"},
+				prConsentManagementFe:      {"consent_management_fe", "targetRevision"},
 				prFeAuthenticationProvider: {"auth_provider_fe", "targetRevision"},
 				prFeAuthenticationProvider: {"authentication_provider_fe", "targetRevision"},
 				prFeUsersAndRoles:          {"users_roles_fe", "targetRevision"},
