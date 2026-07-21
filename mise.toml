@@ -371,8 +371,8 @@ clear_agent() {
 
   echo "Sync with argocd the deployer and the final chart"
   (
-    timeout 5m mise run argo:cli  app sync --prune "$DEPLOYER_NAME"
-    timeout 5m mise run argo:cli  app sync --prune "$K_NAMESPACE"
+    timeout 5m mise run argo:cli  app sync --async --prune "$DEPLOYER_NAME"
+    timeout 5m mise run argo:cli  app sync --async --prune "$K_NAMESPACE"
     wait
   )
 }
