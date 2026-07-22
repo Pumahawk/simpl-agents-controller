@@ -31,7 +31,7 @@ var TokenBaoCmd = cmd.Cmd{
 }
 
 var ListBaoCmd = cmd.Cmd{
-	CName: "bao:list",
+	CName: "bao:get",
 	CRun: func(args []string) error {
 
 		fs := flag.NewFlagSet("", flag.ExitOnError)
@@ -60,21 +60,39 @@ var ListBaoCmd = cmd.Cmd{
 			cl.Url = host
 		}
 
-		res, err := cl.Mounts()
-		if err != nil {
-			fmt.Println("bao mounts error", err)
-			os.Exit(1)
+		if fs.NArg() > 0 {
+			KeyList(cl, fs.Arg(0))
+		} else {
+			MountCmd(cl)
 		}
-
-		tw := tabwriter.NewWriter(os.Stdout, 2, 2, 2, ' ', 0)
-		fmt.Fprintf(tw, "%s\t%s\n", "Name", "Desc")
-		for _, v := range res.Items {
-			fmt.Fprintf(tw, "%s\t%s\n", v.Name, v.Desc)
-		}
-		tw.Flush()
-
 		return nil
 	},
+}
+
+func MountCmd(cl *bao.Client) {
+	res, err := cl.Mounts()
+	if err != nil {
+		fmt.Println("bao mounts error", err)
+		os.Exit(1)
+	}
+
+	tw := tabwriter.NewWriter(os.Stdout, 2, 2, 2, ' ', 0)
+	fmt.Fprintf(tw, "%s\t%s\n", "Name", "Desc")
+	for _, v := range res.Items {
+		fmt.Fprintf(tw, "%s\t%s\n", v.Name, v.Desc)
+	}
+	tw.Flush()
+}
+
+func KeyList(cl *bao.Client, key string) {
+	res, err := cl.KeysList(key)
+	if err != nil {
+		fmt.Println("unable to get list keys", err)
+		os.Exit(1)
+	}
+	for _, v := range res.Items {
+		fmt.Println(v.Name)
+	}
 }
 
 type BaoFlags struct {

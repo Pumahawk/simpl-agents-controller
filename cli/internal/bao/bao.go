@@ -79,6 +79,37 @@ type MountItem struct {
 	Desc string
 }
 
+func (c *Client) doReq(req *http.Request, resBody any) error {
+
+	tk, err := c.TokenFunc()
+	if err != nil {
+		return err
+	}
+
+	if tk != "" {
+		req.Header.Set("authorization", "Bearer "+tk)
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode < 200 || res.StatusCode >= 300 {
+		return fmt.Errorf("bao invalid status code response code=%d", res.StatusCode)
+	}
+
+	if resBody != nil {
+		err = json.NewDecoder(res.Body).Decode(resBody)
+		if err != nil {
+			return fmt.Errorf("response decode: %w", err)
+		}
+	}
+
+	return nil
+}
+
 func (c *Client) Mounts() (*MountsRes, error) {
 	u, err := url.JoinPath(c.Url, "/v1/sys/mounts")
 	if err != nil {
@@ -90,29 +121,10 @@ func (c *Client) Mounts() (*MountsRes, error) {
 		return nil, err
 	}
 
-	tk, err := c.TokenFunc()
-	if err != nil {
-		return nil, err
-	}
-
-	if tk != "" {
-		req.Header.Set("authorization", "Bearer "+tk)
-	}
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		return nil, fmt.Errorf("bao invalid status code response code=%d", res.StatusCode)
-	}
-
 	var resj map[string]any
-	err = json.NewDecoder(res.Body).Decode(&resj)
+	err = c.doReq(req, &resj)
 	if err != nil {
-		return nil, fmt.Errorf("response decode: %w", err)
+		return nil, err
 	}
 
 	var items []MountItem
@@ -122,4 +134,39 @@ func (c *Client) Mounts() (*MountsRes, error) {
 		items = append(items, MountItem{k, ds})
 	}
 	return &MountsRes{items}, nil
+}
+
+type KeysMetadataRes struct {
+	Items []KeysMetadataItem
+}
+
+type KeysMetadataItem struct {
+	Name string
+}
+
+func (c *Client) KeysList(key string) (*KeysMetadataRes, error) {
+	u, err := url.JoinPath(c.Url, "v1", key, "metadata")
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", u+"?list=true", nil)
+	if err != nil {
+		return nil, err
+	}
+	var resj map[string]any
+	err = c.doReq(req, &resj)
+	if err != nil {
+		return nil, err
+	}
+
+	var items []KeysMetadataItem
+	if arr, ok := resj["data"].(map[string]any)["keys"].([]any); ok {
+		for _, v := range arr {
+			if name, ok := v.(string); ok {
+				items = append(items, KeysMetadataItem{name})
+			}
+		}
+	}
+	return &KeysMetadataRes{items}, nil
 }
