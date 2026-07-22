@@ -160,9 +160,9 @@ run = """
 function main() {
   SECRET_KEY="$1"
   shift;
-  T_BAO=$(kubectl -n common01 get secret secrets-root-token -o jsonpath="{.data.token}" | base64 -d)
+  T_BAO=$(kubectl -n "${COMMON-common01}" get secret secrets-root-token -o jsonpath="{.data.token}" | base64 -d)
   (
-  kubectl -n common01 exec -i openbao-common01-0 -- sh -b << EOF
+  kubectl -n "${COMMON-common01}" exec -i openbao-"${COMMON-common01}"-0 -- sh -b << EOF
   >&2 bao login "$T_BAO" \
   && bao kv get -format=json $@ "$SECRET_KEY"
 EOF
@@ -172,10 +172,12 @@ main
 """
 
 [tasks."cluster:db:exec"]
-run = "kubectl exec -n common01 pg-cluster-0 -- psql -U postgres"
+shell = "bash -ec"
+run = "kubectl exec -n \"${COMMON-common01}\" pg-cluster-0 -- psql -U postgres"
 
 [tasks."cluster:db:connect"]
-run = "kubectl exec -it -n common01 pg-cluster-0 -- psql -U postgres"
+shell = "bash -ec"
+run = "kubectl exec -it -n \"${COMMON-common01}\" pg-cluster-0 -- psql -U postgres"
 
 [tasks."cluster:db:get_connections_by_user"]
 shell = "bash -ec"
@@ -193,7 +195,7 @@ shell = "bash -ec"
 run = """
 # Get db connections
 db_get_connections() {
-kubectl exec -n common01 pg-cluster-2 -- psql -U postgres -c "
+kubectl exec -n "${COMMON-common01}" pg-cluster-2 -- psql -U postgres -c "
 SELECT 
     usename AS name,
     COUNT(*) AS numero_connessioni
@@ -223,11 +225,11 @@ drop_all_tables() {
     return 1
   fi
 
-  local PG_MASTER_POD="$(kubectl -n common01 get pods -l spilo-role=master -ojsonpath={.items[0].metadata.name})"
+  local PG_MASTER_POD="$(kubectl -n "${COMMON-common01}" get pods -l spilo-role=master -ojsonpath={.items[0].metadata.name})"
 
   echo "Connecting to database ${K_NAMESPACE}_${DB_USER} as postgres..."
 
-  kubectl exec -i -n common01 "$PG_MASTER_POD" -- sh -c "
+  kubectl exec -i -n "${COMMON-common01}" "$PG_MASTER_POD" -- sh -c "
     psql -U postgres -d ${K_NAMESPACE}_${DB_USER} <<'SQL'
 DO \\$\\$
 DECLARE
