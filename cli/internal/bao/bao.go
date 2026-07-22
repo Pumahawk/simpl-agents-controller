@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"strconv"
 )
 
 type Client struct {
@@ -169,4 +170,95 @@ func (c *Client) KeysList(key string) (*KeysMetadataRes, error) {
 		}
 	}
 	return &KeysMetadataRes{items}, nil
+}
+
+type SecretVersRes struct {
+	CurrentVersion int
+	OldestVersion  int
+	Versions       []SecretVersItem
+}
+
+type SecretVersItem struct {
+	Version int
+}
+
+func (c *Client) SecretVers(key, name string) (*SecretVersRes, error) {
+	u, err := url.JoinPath(c.Url, "v1", key, "metadata", name)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, err
+	}
+	var resj map[string]any
+	err = c.doReq(req, &resj)
+	if err != nil {
+		return nil, err
+	}
+
+	var currentVersion int
+	cvf, ok := resj["data"].(map[string]any)["current_version"].(float64)
+	if !ok {
+		return nil, fmt.Errorf("unable to extract current_version")
+	}
+	currentVersion = int(cvf)
+
+	var oldestVersion int
+	ovf, ok := resj["data"].(map[string]any)["oldest_version"].(float64)
+	if !ok {
+		return nil, fmt.Errorf("unable to extract oldest_version")
+	}
+	oldestVersion = int(ovf)
+
+	var items []SecretVersItem
+	if vs, ok := resj["data"].(map[string]any)["versions"].(map[string]any); ok {
+		for k := range vs {
+			v, err := strconv.Atoi(k)
+			if err != nil {
+				return nil, fmt.Errorf("unexpected version string conversino: %w", err)
+			}
+			items = append(items, SecretVersItem{v})
+		}
+	}
+	return &SecretVersRes{currentVersion, oldestVersion, items}, nil
+}
+
+type SecretVerRes struct {
+	Items []SecretVerItem
+}
+
+type SecretVerItem struct {
+	Key   string
+	Value string
+}
+
+func (c *Client) SecretVer(key, name string, ver int) (*SecretVerRes, error) {
+	u, err := url.JoinPath(c.Url, "v1", key, "data", name)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", u+"?version="+strconv.Itoa(ver), nil)
+	if err != nil {
+		return nil, err
+	}
+	var resj map[string]any
+	err = c.doReq(req, &resj)
+	if err != nil {
+		return nil, err
+	}
+
+	var items []SecretVerItem
+	if vs, ok := resj["data"].(map[string]any)["data"].(map[string]any); ok {
+		for k, v := range vs {
+			v, ok := v.(string)
+			if !ok {
+				return nil, fmt.Errorf("value of secret is not a string")
+			}
+			items = append(items, SecretVerItem{k, v})
+		}
+	}
+	return &SecretVerRes{items}, nil
 }
