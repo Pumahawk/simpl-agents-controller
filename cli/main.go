@@ -22,6 +22,8 @@ var cmds cmd.Command = &cmd.Group{
 		&LastVersionCmd,
 		&UpdateVersionCmd,
 		&TokenizeCmd,
+		&TokenBaoCmd,
+		&ListBaoCmd,
 	},
 }
 
