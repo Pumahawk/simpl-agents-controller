@@ -7,3 +7,7 @@
 [submodule "simpl-repo/provider-iaa"]
 	path = simpl-repo/provider-iaa
 	url = https://code.europa.eu/simpl/simpl-open/development/iaa/provider-iaa.git
+[submodule "simpl-repo/participant-iaa"]
+	path = simpl-repo/participant-iaa
+	url = https://code.europa.eu/simpl/simpl-open/development/iaa/agent-iaa/participant-iaa.git
+	branch = develop
