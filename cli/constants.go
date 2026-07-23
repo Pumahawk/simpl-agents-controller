@@ -4,6 +4,7 @@ var prAuthenticationProvider = PrInfo{939, "helm", "authentication-provider"}
 var prChAuthority = PrInfo{1402, "helm", "ch-authority"}
 var prChConsumer = PrInfo{1404, "helm", "ch-consumer"}
 var prChProvider = PrInfo{1403, "helm", "ch-provider"}
+var prChParticipant = PrInfo{1492, "helm", "ch-participant"}
 var prCommon = PrInfo{796, "maven", "common"}
 var prConsentManagementBe = PrInfo{1723, "helm", "consent-management-be"}
 var prConsentManagementFe = PrInfo{1950, "helm", "consent-management-fe"}
@@ -57,6 +58,7 @@ var prIdsDemux = projectIdsDemux{
 		"ch-authority",
 		"ch-consumer",
 		"ch-provider",
+		"ch-participant",
 	},
 }
 
@@ -157,6 +159,10 @@ var prIds = projectNameSvT{
 	// Chart consumer
 	"ch-provider": prChProvider,
 	"ch-pro":      prChProvider,
+
+	// Chart participant
+	"ch-participant": prChParticipant,
+	"ch-par":         prChParticipant,
 }
 
 type projectNameSvT map[string]PrInfo
