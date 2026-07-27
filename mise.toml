@@ -173,11 +173,11 @@ main
 
 [tasks."cluster:db:exec"]
 shell = "bash -ec"
-run = "kubectl exec -n \"${COMMON-common01}\" pg-cluster-0 -- psql -U postgres"
+run = "kubectl exec -n \"${COMMON-common01}\" \"$(kubectl get pod -n \"${COMMON-common01}\" -l spilo-role=master -oname)\" -- psql -U postgres"
 
 [tasks."cluster:db:connect"]
 shell = "bash -ec"
-run = "kubectl exec -it -n \"${COMMON-common01}\" pg-cluster-0 -- psql -U postgres"
+run = "kubectl exec -it -n \"${COMMON-common01}\" \"$(kubectl get pod -n \"${COMMON-common01}\" -l spilo-role=master -oname)\" -- psql -U postgres"
 
 [tasks."cluster:db:get_connections_by_user"]
 shell = "bash -ec"
@@ -195,7 +195,7 @@ shell = "bash -ec"
 run = """
 # Get db connections
 db_get_connections() {
-kubectl exec -n "${COMMON-common01}" pg-cluster-2 -- psql -U postgres -c "
+kubectl exec -n "${COMMON-common01}" "$(kubectl get pod -n "${COMMON-common01}" -l spilo-role=master -oname)" -- psql -U postgres -c "
 SELECT 
     usename AS name,
     COUNT(*) AS numero_connessioni
