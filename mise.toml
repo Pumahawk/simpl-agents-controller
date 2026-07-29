@@ -1052,8 +1052,8 @@ file = "./scripts/align-participant-charts.bash"
 
 [tasks."chart:update_consumer"]
 shell = "bash -ec"
-run = "mise run chart:update_participant consumer-iaa"
+run = "mise run -q chart:update_participant consumer-iaa"
 
 [tasks."chart:update_provider"]
 shell = "bash -ec"
-run = "mise run chart:update_participant provider-iaa"
+run = "mise run -q chart:update_participant provider-iaa"

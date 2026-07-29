@@ -8,22 +8,19 @@ function align_chart() {
     return 1
   fi
 
-  env -C "$repo" bash -xec "$(
+  env -C "$repo" bash -ec "$(
     cat <<'EOF'
-    git add -A
-    git stash
-    git fetch --multiple --prune origin participant 
-    git checkout -d
-    git branch -D feature/chart-participant-develop || true
-    git checkout participant/develop
-    commit="$(git rev-list -n1 HEAD)"
-    git reset --soft origin/feature/chart-participant-develop
-    git commit -m "update chart participant $commit"
-    git push HEAD:feature/chart-participant-develop
-    git checkout origin/develop
-    git branch -d chart-participant-update || true
-    git checkout -b chart-participant-update
-    git merge --no-edit origin/feature/chart-participant-develop
+    git fetch --prune -m origin participant
+    if >/dev/null git diff --exit-code origin/feature/chart-participant-develop participant/develop; then
+      >&2 echo "No differences between origin/feature/chart-participant-develop participant/develop."
+      exit 0
+    fi
+
+    CM_PR_DEV="$(git commit-tree participant/develop^{tree} -p origin/feature/chart-participant-develop -m "update $(git rev-list -n1 participant/develop)")"
+    TR_MR="$(git merge-tree origin/develop "$CM_PR_DEV")"
+    CM_DEV="$(git commit-tree "$TR_MR" -p origin/develop -p "$CM_PR_DEV" -m "update $(git rev-list -n1 participant/develop)")"
+
+    git push origin "$CM_PR_DEV":feature/chart-participant-develop "$CM_DEV":feature/update-develop
 EOF
   )"
 }
