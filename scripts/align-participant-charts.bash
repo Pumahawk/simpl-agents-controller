@@ -20,7 +20,7 @@ function align_chart() {
     TR_MR="$(git merge-tree origin/develop "$CM_PR_DEV")"
     CM_DEV="$(git commit-tree "$TR_MR" -p origin/develop -p "$CM_PR_DEV" -m "update $(git rev-list -n1 participant/develop)")"
 
-    git push origin "$CM_PR_DEV":feature/chart-participant-develop "$CM_DEV":feature/update-develop
+    git push origin "$CM_PR_DEV":refs/heads/feature/chart-participant-develop "$CM_DEV":refs/heads/feature/update-develop
 EOF
   )"
 }
