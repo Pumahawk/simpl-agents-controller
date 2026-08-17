@@ -81,6 +81,19 @@ var UpdateVersionCmd = cmd.Cmd{
 				prTier2Proxy:               {"tier2_proxy", "targetRevision"},
 				prUsersRoles:               {"users_roles", "targetRevision"},
 			},
+			"simpl-repo/participant-iaa/charts/values.yaml": {
+				prAuthenticationProvider:   {"auth_provider", "targetRevision"},
+				prConsentManagementBe:      {"consent_management", "targetRevision"},
+				prConsentManagementFe:      {"consent_management_fe", "targetRevision"},
+				prFeAuthenticationProvider: {"auth_provider_fe", "targetRevision"},
+				prFeAuthenticationProvider: {"authentication_provider_fe", "targetRevision"},
+				prFeUsersAndRoles:          {"users_roles_fe", "targetRevision"},
+				prKeycloakAuthenticator:    {"keycloak", "keycloak_authenticator", "targetRevision"},
+				prTier1Gateway:             {"tier1_gateway", "targetRevision"},
+				prTier2Gateway:             {"tier2_gateway", "targetRevision"},
+				prTier2Proxy:               {"tier2_proxy", "targetRevision"},
+				prUsersRoles:               {"users_roles", "targetRevision"},
+			},
 		}
 
 		type yamlSt struct {

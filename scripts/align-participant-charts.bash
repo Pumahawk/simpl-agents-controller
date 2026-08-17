@@ -8,7 +8,7 @@ function align_chart() {
     return 1
   fi
 
-  env -C "$repo" bash -ec "$(
+  env -C "$repo" bash -xec "$(
     cat <<'EOF'
     git fetch --prune -m origin participant
     if >/dev/null git diff --exit-code origin/feature/chart-participant-develop participant/develop; then
