@@ -14,7 +14,8 @@ var prFeAuthenticationProvider = PrInfo{1308, "helm", "fe-authentication-provide
 var prFeIdentityProvider = PrInfo{1311, "helm", "fe-identity-provider"}
 var prFeOnboarding = PrInfo{1307, "helm", "fe-onboarding"}
 var prFeSecurityAttributeProvider = PrInfo{1309, "helm", "fe-security-attribute-provider"}
-var prFeUsersAndRoles = PrInfo{1310, "helm", "fe-users-and-roles"}
+var prFeUsersAndRolesOld = PrInfo{1310, "helm", "fe-users-and-roles"}
+var prFeUsersAndRoles = PrInfo{1999, "helm", "fe-users-and-roles"}
 var prIdentityProvider = PrInfo{913, "helm", "identity-provider"}
 var prKeycloakAuthenticator = PrInfo{915, "maven", "keycloak-authenticator"}
 var prOnboarding = PrInfo{770, "helm", "onboarding"}
@@ -24,7 +25,8 @@ var prTier1Authentication = PrInfo{1457, "helm", "tier1-authentication"}
 var prTier1Gateway = PrInfo{772, "helm", "tier1-gateway"}
 var prTier2Gateway = PrInfo{860, "helm", "tier2-gateway"}
 var prTier2Proxy = PrInfo{1112, "helm", "tier2-proxy"}
-var prUsersRoles = PrInfo{771, "helm", "users-roles"}
+var prUsersRolesOld = PrInfo{771, "helm", "users-roles"}
+var prUsersRoles = PrInfo{2000, "helm", "users-roles"}
 
 var prIdsDemux = projectIdsDemux{
 	"microbe": {
@@ -105,8 +107,10 @@ var prIds = projectNameSvT{
 	"fe-sap":                         prFeSecurityAttributeProvider,
 
 	// Frontend Users and roles
-	"fe-users-and-roles": prFeUsersAndRoles,
-	"fe-usr":             prFeUsersAndRoles,
+	"fe-users-and-roles":     prFeUsersAndRoles,
+	"fe-usr":                 prFeUsersAndRoles,
+	"fe-users-and-roles-old": prFeUsersAndRolesOld,
+	"fe-usr-old":             prFeUsersAndRolesOld,
 
 	// Backend Identity provider
 	"identity-provider": prIdentityProvider,
@@ -145,8 +149,10 @@ var prIds = projectNameSvT{
 	"t2x":         prTier2Proxy,
 
 	// Backend Users roles
-	"users-roles": prUsersRoles,
-	"usr":         prUsersRoles,
+	"users-roles":     prUsersRoles,
+	"usr":             prUsersRoles,
+	"users-roles-old": prUsersRolesOld,
+	"usr-old":         prUsersRolesOld,
 
 	// Chart authority
 	"ch-authority": prChAuthority,
