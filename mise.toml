@@ -636,15 +636,15 @@ local NAME="${1?Missin project name}"
 cat << 'EOF' | grep -E ",${NAME},"
 helm,tier1_gateway,772
 helm,sap,861
-helm,users_roles,771
+helm,users_roles,2000
 helm,fe_auth_provider,1308
 helm,authentication_provider_fe,1308
-helm,fe_users_roles,1310
+helm,fe_users_roles,1999
 helm,fe_identity_provider,1311
 helm,fe_onboarding,1307
 helm,fe_security_attribute_provider,1309
 helm,auth_provider_fe,1308
-helm,users_roles_fe,1310
+helm,users_roles_fe,1999
 helm,identity_provider_fe,1311
 helm,onboarding_fe,1307
 helm,security_attribute_provider_fe,1309
