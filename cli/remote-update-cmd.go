@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"maps"
 	"os"
 	"os/exec"
@@ -33,19 +32,15 @@ var RemoteUpdateCmd = cmd.Cmd{
 					if !ok {
 						mf = make(map[string]string)
 					}
-					for _, br := range depInfo[p.Deployer] {
-						mf[br] = ""
-					}
+					br := depInfo[p.Deployer]
+					mf[br] = ""
 					versionsStore[pr.ProjectId] = mf
 				}
 			}
 		}
 		GetProjectLastVersion(versionsStore)
-		for prId, branch := range versionsStore {
-			for branch, version := range branch {
-				fmt.Printf("%d %s %s\n", prId, branch, version)
-			}
-		}
+		argoApp.UpdateParameters(versionsStore, depInfo)
+		json.NewEncoder(os.Stdout).Encode(argoApp)
 		return nil
 	},
 }
@@ -126,6 +121,62 @@ func (a ArgoApps) GetParameters() []Paramater {
 	return p
 }
 
+func (a ArgoApps) UpdateParameters(versionsStore map[int]map[string]string, depInfo map[string]string) {
+	items := []any{map[string]any(a)}
+	if v, ok := a["items"]; ok && v != nil {
+		if v, ok := v.([]any); ok {
+			items = v
+		}
+	}
+	for _, item := range items {
+		if item, ok := item.(map[string]any); ok {
+			if metadata, ok := item["metadata"]; ok && metadata != nil {
+				if metadata, ok := metadata.(map[string]any); ok {
+					if deployer, ok := metadata["name"]; ok && deployer != nil {
+						if deployer, ok := deployer.(string); ok {
+							if v, ok := item["spec"]; ok && v != nil {
+								if v, ok := v.(map[string]any); ok {
+									if v, ok := v["source"]; ok && v != nil {
+										if v, ok := v.(map[string]any); ok {
+											if v, ok := v["helm"]; ok && v != nil {
+												if v, ok := v.(map[string]any); ok {
+													if v, ok := v["parameters"]; ok && v != nil {
+														if v, ok := v.([]any); ok {
+															for _, parameter := range v {
+																if parameter, ok := parameter.(map[string]any); ok {
+																	if name, ok := parameter["name"]; ok && name != nil {
+																		if name, ok := name.(string); ok {
+																			if value, ok := parameter["value"]; ok && value != nil {
+																				if _, ok := value.(string); ok {
+																					if info, ok := projectIdByTargetName[name]; ok {
+																						branch := depInfo[deployer]
+																						version := versionsStore[info.ProjectId][branch]
+																						if version != "" {
+																							parameter["value"] = version
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 type ProjectInfo struct {
 	Type      string
 	ProjectId int
@@ -176,19 +227,16 @@ main:
 	}
 }
 
-func parseArgsDeployer(args []string) map[string][]string {
-	out := make(map[string][]string)
+func parseArgsDeployer(args []string) map[string]string {
+	out := make(map[string]string)
 	for _, arg := range args {
-		log.Printf("%s", arg)
 		v := strings.Split(arg, ":")
 		deployer := v[0]
 		branch := "main"
 		if len(v) > 1 {
 			branch = v[1]
 		}
-		if !slices.Contains(out[deployer], branch) {
-			out[deployer] = append(out[deployer], branch)
-		}
+		out[deployer] = branch
 	}
 	return out
 }

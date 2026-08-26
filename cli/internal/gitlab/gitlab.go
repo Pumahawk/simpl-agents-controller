@@ -3,7 +3,6 @@ package gitlab
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -40,7 +39,6 @@ func (c *Client) Packages(id, page, perpage int) ([]PackageItem, error) {
 		"sort=desc" +
 		"&page=" + strconv.Itoa(page) +
 		"&perpage=" + strconv.Itoa(perpage)
-	log.Printf("%s", rawUrl)
 
 	res, err := http.Get(rawUrl)
 	if err != nil {
