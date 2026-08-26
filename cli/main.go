@@ -24,6 +24,7 @@ var cmds cmd.Command = &cmd.Group{
 		&TokenizeCmd,
 		&TokenBaoCmd,
 		&ListBaoCmd,
+		&RemoteUpdateCmd,
 	},
 }
 

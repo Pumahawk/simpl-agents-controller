@@ -1,0 +1,194 @@
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"log"
+	"maps"
+	"os"
+	"os/exec"
+	"slices"
+	"strings"
+
+	"github.com/Pumahawk/simpl-agents-controller/internal/cmd"
+)
+
+var RemoteUpdateCmd = cmd.Cmd{
+	CName: "remote:update",
+	CRun: func(args []string) error {
+		depInfo := parseArgsDeployer(args)
+		deployers := slices.Collect(maps.Keys(depInfo))
+		argoApp, err := GetArgoApps(deployers)
+		if err != nil {
+			fmt.Printf("errore on get argo apps: %s\n", err)
+			os.Exit(1)
+		}
+		ps := argoApp.GetParameters()
+		versionsStore := make(map[int]map[string]string)
+		for _, p := range ps {
+			if _, ok := depInfo[p.Deployer]; ok {
+				if pr, ok := projectIdByTargetName[p.Name]; ok {
+					mf, ok := versionsStore[pr.ProjectId]
+					if !ok {
+						mf = make(map[string]string)
+					}
+					for _, br := range depInfo[p.Deployer] {
+						mf[br] = ""
+					}
+					versionsStore[pr.ProjectId] = mf
+				}
+			}
+		}
+		GetProjectLastVersion(versionsStore)
+		for prId, branch := range versionsStore {
+			for branch, version := range branch {
+				fmt.Printf("%d %s %s\n", prId, branch, version)
+			}
+		}
+		return nil
+	},
+}
+
+type ArgoApps map[string]any
+
+func GetArgoApps(apps []string) (ArgoApps, error) {
+	out := &bytes.Buffer{}
+	args := append([]string{"-n", "argocd", "get", "application", "-o", "json"}, apps...)
+	c := exec.Command("kubectl", args...)
+	c.Stderr = os.Stderr
+	c.Stdout = out
+	if err := c.Run(); err != nil {
+		return nil, err
+	}
+	data := make(ArgoApps)
+	if err := json.NewDecoder(out).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+type Paramater struct {
+	Deployer string
+	Name     string
+	Value    string
+}
+
+func (a ArgoApps) GetParameters() []Paramater {
+	var p []Paramater
+	items := []any{map[string]any(a)}
+	if v, ok := a["items"]; ok && v != nil {
+		if v, ok := v.([]any); ok {
+			items = v
+		}
+	}
+	for _, item := range items {
+		if item, ok := item.(map[string]any); ok {
+			if metadata, ok := item["metadata"]; ok && metadata != nil {
+				if metadata, ok := metadata.(map[string]any); ok {
+					if deployer, ok := metadata["name"]; ok && deployer != nil {
+						if deployer, ok := deployer.(string); ok {
+							if v, ok := item["spec"]; ok && v != nil {
+								if v, ok := v.(map[string]any); ok {
+									if v, ok := v["source"]; ok && v != nil {
+										if v, ok := v.(map[string]any); ok {
+											if v, ok := v["helm"]; ok && v != nil {
+												if v, ok := v.(map[string]any); ok {
+													if v, ok := v["parameters"]; ok && v != nil {
+														if v, ok := v.([]any); ok {
+															for _, parameter := range v {
+																if parameter, ok := parameter.(map[string]any); ok {
+																	if name, ok := parameter["name"]; ok && name != nil {
+																		if name, ok := name.(string); ok {
+																			if value, ok := parameter["value"]; ok && value != nil {
+																				if value, ok := value.(string); ok {
+																					p = append(p, Paramater{deployer, name, string(value)})
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return p
+}
+
+type ProjectInfo struct {
+	Type      string
+	ProjectId int
+}
+
+var projectIdByTargetName = map[string]ProjectInfo{
+	"keycloak.keycloak_authenticator.targetRevision":        {"maven", 915},
+	"keycloak.eidas_demo_keycloak_extension.targetRevision": {"maven", 1313},
+	"keycloak.oid4vp_keycloak_extension.targetRevision":     {"maven", 1840},
+	"tier1_gateway.targetRevision":                          {"helm", 772},
+	"sap.targetRevision":                                    {"helm", 861},
+	"users_roles.targetRevision":                            {"helm", 2000},
+	"fe_auth_provider.targetRevision":                       {"helm", 1308},
+	"fe_users_roles.targetRevision":                         {"helm", 1999},
+	"fe_identity_provider.targetRevision":                   {"helm", 1311},
+	"fe_onboarding.targetRevision":                          {"helm", 1307},
+	"fe_security_attribute_provider.targetRevision":         {"helm", 1309},
+	"onboarding.targetRevision":                             {"helm", 770},
+	"tier2_gateway.targetRevision":                          {"helm", 860},
+	"identity_provider.targetRevision":                      {"helm", 913},
+	"auth_provider.targetRevision":                          {"helm", 939},
+	"tier2_proxy.targetRevision":                            {"helm", 1112},
+}
+
+// map[projectId]map[ref]version
+func GetProjectLastVersion(out map[int]map[string]string) {
+	var pris []PrInfo
+	for prId := range out {
+		pris = append(pris, PrInfo{prId, "nd", "nd"})
+	}
+	chv := GetVersions(pris)
+
+main:
+	for pk := range chv {
+		if !strings.HasSuffix(pk.Version, ".latest") {
+			if v, ok := out[pk.PrInfo.Id][pk.Ref]; ok {
+				if v == "" {
+					out[pk.PrInfo.Id][pk.Ref] = pk.Version
+					for _, v := range out[pk.PrInfo.Id] {
+						if v == "" {
+							continue main
+						}
+					}
+					pk.Stop()
+				}
+			}
+		}
+	}
+}
+
+func parseArgsDeployer(args []string) map[string][]string {
+	out := make(map[string][]string)
+	for _, arg := range args {
+		log.Printf("%s", arg)
+		v := strings.Split(arg, ":")
+		deployer := v[0]
+		branch := "main"
+		if len(v) > 1 {
+			branch = v[1]
+		}
+		if !slices.Contains(out[deployer], branch) {
+			out[deployer] = append(out[deployer], branch)
+		}
+	}
+	return out
+}
