@@ -45,6 +45,7 @@ var prIdsDemux = projectIdsDemux{
 		"fe-onboarding",
 		"fe-security-attribute-provider",
 		"fe-users-and-roles",
+		"consent-management-fe",
 	},
 	"lib": {
 		"common",
