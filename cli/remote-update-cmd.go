@@ -244,22 +244,26 @@ type ProjectInfo struct {
 }
 
 var projectIdByTargetName = map[string]ProjectInfo{
-	"keycloak.keycloak_authenticator.targetRevision":        {"maven", 915},
-	"keycloak.eidas_demo_keycloak_extension.targetRevision": {"maven", 1313},
-	"keycloak.oid4vp_keycloak_extension.targetRevision":     {"maven", 1840},
-	"tier1_gateway.targetRevision":                          {"helm", 772},
-	"sap.targetRevision":                                    {"helm", 861},
-	"users_roles.targetRevision":                            {"helm", 2000},
+	"auth_provider.targetRevision":                          {"helm", 939},
+	"authentication_provider_fe.targetRevision":             {"helm", 1308},
+	"consent_management.targetRevision":                     {"helm", 1723},
+	"consent_management_fe.targetRevision":                  {"helm", 1950},
 	"fe_auth_provider.targetRevision":                       {"helm", 1308},
-	"fe_users_roles.targetRevision":                         {"helm", 1999},
 	"fe_identity_provider.targetRevision":                   {"helm", 1311},
 	"fe_onboarding.targetRevision":                          {"helm", 1307},
 	"fe_security_attribute_provider.targetRevision":         {"helm", 1309},
-	"onboarding.targetRevision":                             {"helm", 770},
-	"tier2_gateway.targetRevision":                          {"helm", 860},
+	"fe_users_roles.targetRevision":                         {"helm", 1999},
 	"identity_provider.targetRevision":                      {"helm", 913},
-	"auth_provider.targetRevision":                          {"helm", 939},
+	"keycloak.eidas_demo_keycloak_extension.targetRevision": {"maven", 1313},
+	"keycloak.keycloak_authenticator.targetRevision":        {"maven", 915},
+	"keycloak.oid4vp_keycloak_extension.targetRevision":     {"maven", 1840},
+	"onboarding.targetRevision":                             {"helm", 770},
+	"sap.targetRevision":                                    {"helm", 861},
+	"tier1_gateway.targetRevision":                          {"helm", 772},
+	"tier2_gateway.targetRevision":                          {"helm", 860},
 	"tier2_proxy.targetRevision":                            {"helm", 1112},
+	"users_roles.targetRevision":                            {"helm", 2000},
+	"users_roles_fe.targetRevision":                         {"helm", 1999},
 }
 
 // map[projectId]map[ref]version
