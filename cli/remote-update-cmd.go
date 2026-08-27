@@ -7,7 +7,9 @@ import (
 	"maps"
 	"os"
 	"os/exec"
+	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/Pumahawk/simpl-agents-controller/internal/cmd"
@@ -24,6 +26,7 @@ var RemoteUpdateCmd = cmd.Cmd{
 			os.Exit(1)
 		}
 		ps := argoApp.GetParameters()
+		ids := argoApp.GetProjectIds()
 		versionsStore := make(map[int]map[string]string)
 		for _, p := range ps {
 			if _, ok := depInfo[p.Deployer]; ok {
@@ -37,6 +40,15 @@ var RemoteUpdateCmd = cmd.Cmd{
 					versionsStore[pr.ProjectId] = mf
 				}
 			}
+		}
+		for d, id := range ids {
+			mf, ok := versionsStore[id]
+			if !ok {
+				mf = make(map[string]string)
+			}
+			br := depInfo[d]
+			mf[br] = ""
+			versionsStore[id] = mf
 		}
 		GetProjectLastVersion(versionsStore)
 		argoApp.UpdateParameters(versionsStore, depInfo)
@@ -67,6 +79,44 @@ type Paramater struct {
 	Deployer string
 	Name     string
 	Value    string
+}
+
+func (a ArgoApps) GetProjectIds() map[string]int {
+	out := make(map[string]int)
+	items := []any{map[string]any(a)}
+	if v, ok := a["items"]; ok && v != nil {
+		if v, ok := v.([]any); ok {
+			items = v
+		}
+	}
+	for _, item := range items {
+		if item, ok := item.(map[string]any); ok {
+			if metadata, ok := item["metadata"]; ok && metadata != nil {
+				if metadata, ok := metadata.(map[string]any); ok {
+					if deployer, ok := metadata["name"]; ok && deployer != nil {
+						if deployer, ok := deployer.(string); ok {
+							if v, ok := item["spec"]; ok && v != nil {
+								if v, ok := v.(map[string]any); ok {
+									if v, ok := v["source"]; ok && v != nil {
+										if v, ok := v.(map[string]any); ok {
+											if repoURL, ok := v["repoURL"]; ok {
+												if repoURL, ok := repoURL.(string); ok {
+													if id, err := projectIdFromRepoUrl(repoURL); err == nil {
+														out[deployer] = id
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return out
 }
 
 func (a ArgoApps) GetParameters() []Paramater {
@@ -138,6 +188,17 @@ func (a ArgoApps) UpdateParameters(versionsStore map[int]map[string]string, depI
 								if v, ok := v.(map[string]any); ok {
 									if v, ok := v["source"]; ok && v != nil {
 										if v, ok := v.(map[string]any); ok {
+											if repoURL, ok := v["repoURL"]; ok {
+												if repoURL, ok := repoURL.(string); ok {
+													if id, err := projectIdFromRepoUrl(repoURL); err == nil {
+														branch := depInfo[deployer]
+														version := versionsStore[id][branch]
+														if version != "" {
+															v["targetRevision"] = version
+														}
+													}
+												}
+											}
 											if v, ok := v["helm"]; ok && v != nil {
 												if v, ok := v.(map[string]any); ok {
 													if v, ok := v["parameters"]; ok && v != nil {
@@ -239,4 +300,13 @@ func parseArgsDeployer(args []string) map[string]string {
 		out[deployer] = branch
 	}
 	return out
+}
+
+func projectIdFromRepoUrl(repoURL string) (int, error) {
+	rx := regexp.MustCompile("https://code.europa.eu/api/v4/projects/([0-9][0-9]*)/packages/helm/stable")
+	m := rx.FindStringSubmatch(repoURL)
+	if len(m) == 2 {
+		return strconv.Atoi(m[1])
+	}
+	return -1, fmt.Errorf("unable to retrieve project id from repoURL %q", repoURL)
 }
