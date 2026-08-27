@@ -61,7 +61,7 @@ ejbca:
   valueFiles:
     - values.yaml
 tier1_gateway:
-  projectID: "772"
+  projectID: "2112"
   targetRevision: 2.14.0-rc.1136
   chart_name: tier1-gateway
   resources:
@@ -162,7 +162,7 @@ fe_security_attribute_provider:
       memory: "512Mi"
 onboarding:
   enabled: true
-  projectID: "770"
+  projectID: "2097"
   targetRevision: 2.12.6
   chart_name: onboarding
   resources:
@@ -176,7 +176,7 @@ onboarding:
     - values.yaml
 tier2_gateway:
   enabled: true
-  projectID: "860"
+  projectID: "2215"
   targetRevision: 2.11.3
   chart_name: tier2-gateway
   resources:
@@ -191,7 +191,7 @@ tier2_gateway:
     - values-routes-authority.yaml
 identity_provider:
   enabled: true
-  projectID: "913"
+  projectID: "2119"
   targetRevision: 2.11.3
   chart_name: identity-provider
   fullnameOverride: identity-provider
@@ -297,7 +297,7 @@ ejbca:
   valueFiles:
     - values.yaml
 tier1_gateway:
-  projectID: "772"
+  projectID: "2112"
   targetRevision: 2.14.0-rc.1135
   chart_name: tier1-gateway
   resources:
@@ -398,7 +398,7 @@ fe_security_attribute_provider:
       memory: "512Mi"
 onboarding:
   enabled: true
-  projectID: "770"
+  projectID: "2097"
   targetRevision: 2.12.6
   chart_name: onboarding
   resources:
@@ -412,7 +412,7 @@ onboarding:
     - values.yaml
 tier2_gateway:
   enabled: true
-  projectID: "860"
+  projectID: "2215"
   targetRevision: 2.11.3
   chart_name: tier2-gateway
   resources:
@@ -427,7 +427,7 @@ tier2_gateway:
     - values-routes-authority.yaml
 identity_provider:
   enabled: true
-  projectID: "913"
+  projectID: "2119"
   targetRevision: 2.11.3
   chart_name: identity-provider
   fullnameOverride: identity-provider

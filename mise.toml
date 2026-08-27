@@ -634,7 +634,7 @@ function argo_update_versions() {
 function iaa_get_type_and_projectID_by_projectName() {
 local NAME="${1?Missin project name}"
 cat << 'EOF' | grep -E ",${NAME},"
-helm,tier1_gateway,772
+helm,tier1_gateway,2112
 helm,sap,861
 helm,users_roles,2000
 helm,fe_auth_provider,1308
@@ -648,9 +648,9 @@ helm,users_roles_fe,1999
 helm,identity_provider_fe,1311
 helm,onboarding_fe,1307
 helm,security_attribute_provider_fe,1309
-helm,onboarding,770
-helm,tier2_gateway,860
-helm,identity_provider,913
+helm,onboarding,2097
+helm,tier2_gateway,2215
+helm,identity_provider,2119
 helm,auth_provider,939
 helm,tier2_proxy,1112
 helm,consent_management,1723
