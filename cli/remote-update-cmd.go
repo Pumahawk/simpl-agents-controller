@@ -24,8 +24,8 @@ var RemoteUpdateCmd = cmd.Cmd{
 		var jobs int
 
 		fs := flag.NewFlagSet("", flag.ExitOnError)
-		fs.BoolVar(&apply, "apply", false, "")
-		fs.BoolVar(&syncv, "sync", false, "")
+		fs.BoolVar(&apply, "apply", true, "")
+		fs.BoolVar(&syncv, "sync", true, "")
 		fs.IntVar(&jobs, "jobs", 5, "")
 		fs.Parse(args)
 		args = fs.Args()
