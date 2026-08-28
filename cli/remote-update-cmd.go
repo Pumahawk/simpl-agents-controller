@@ -21,10 +21,12 @@ var RemoteUpdateCmd = cmd.Cmd{
 	CName: "remote:update",
 	CRun: func(args []string) error {
 		var apply, syncv bool
+		var jobs int
 
 		fs := flag.NewFlagSet("", flag.ExitOnError)
 		fs.BoolVar(&apply, "apply", false, "")
 		fs.BoolVar(&syncv, "sync", false, "")
+		fs.IntVar(&jobs, "jobs", 5, "")
 		fs.Parse(args)
 		args = fs.Args()
 
@@ -80,7 +82,7 @@ var RemoteUpdateCmd = cmd.Cmd{
 		}
 
 		if syncv {
-			poolsize := make(chan int, 3)
+			poolsize := make(chan int, jobs)
 			wg := &sync.WaitGroup{}
 			for i := range deployers {
 				deployer := deployers[i]
