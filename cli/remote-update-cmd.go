@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"maps"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/Pumahawk/simpl-agents-controller/internal/cmd"
 )
@@ -18,6 +20,14 @@ import (
 var RemoteUpdateCmd = cmd.Cmd{
 	CName: "remote:update",
 	CRun: func(args []string) error {
+		var apply, syncv bool
+
+		fs := flag.NewFlagSet("", flag.ExitOnError)
+		fs.BoolVar(&apply, "apply", false, "")
+		fs.BoolVar(&syncv, "sync", false, "")
+		fs.Parse(args)
+		args = fs.Args()
+
 		depInfo := parseArgsDeployer(args)
 		deployers := slices.Collect(maps.Keys(depInfo))
 		argoApp, err := GetArgoApps(deployers)
@@ -52,7 +62,45 @@ var RemoteUpdateCmd = cmd.Cmd{
 		}
 		GetProjectLastVersion(versionsStore)
 		argoApp.UpdateParameters(versionsStore, depInfo)
-		json.NewEncoder(os.Stdout).Encode(argoApp)
+		if apply {
+			c := exec.Command("kubectl", "apply", "-f", "-")
+			c.Stderr = os.Stderr
+			c.Stdout = os.Stdout
+			out, err := json.Marshal(argoApp)
+			if err != nil {
+				fmt.Printf("unable to create json from argoApp: %s\n", err)
+				os.Exit(1)
+			}
+			c.Stdin = bytes.NewBuffer(out)
+			if err := c.Run(); err != nil {
+				os.Exit(1)
+			}
+		} else {
+			json.NewEncoder(os.Stdout).Encode(argoApp)
+		}
+
+		if syncv {
+			poolsize := make(chan int, 3)
+			wg := &sync.WaitGroup{}
+			for i := range deployers {
+				deployer := deployers[i]
+				wg.Go(func() {
+					poolsize <- 0
+					defer func() {
+						<-poolsize
+					}()
+					c := exec.Command("kubectl", "-n", "argocd", "exec", "argo-cd-argocd-application-controller-0", "--", "argocd", "--core", "app", "sync", "--prune", "--async", deployer)
+					serr := &bytes.Buffer{}
+					c.Stderr = serr
+					if err := c.Run(); err != nil {
+						fmt.Printf("synch error %q: %s\n", deployer, serr)
+					} else {
+						fmt.Printf("synched %q\n", deployer)
+					}
+				})
+			}
+			wg.Wait()
+		}
 		return nil
 	},
 }
