@@ -74,7 +74,7 @@ tier1_gateway:
   valueFiles:
     - values.yaml
 sap:
-  projectID: "861"
+  projectID: "2225"
   targetRevision: 2.13.0-rc.1336
   chart_name: security-attributes-provider
   resources:
@@ -206,7 +206,7 @@ identity_provider:
     - values.yaml
 auth_provider:
   enabled: true
-  projectID: "939"
+  projectID: "2223"
   targetRevision: 2.12.3
   chart_name: authentication-provider
   resources:
@@ -310,7 +310,7 @@ tier1_gateway:
   valueFiles:
     - values.yaml
 sap:
-  projectID: "861"
+  projectID: "2225"
   targetRevision: 2.13.0-rc.1336
   chart_name: security-attributes-provider
   resources:
@@ -442,7 +442,7 @@ identity_provider:
     - values.yaml
 auth_provider:
   enabled: true
-  projectID: "939"
+  projectID: "2223"
   targetRevision: 2.12.3
   chart_name: authentication-provider
   resources:

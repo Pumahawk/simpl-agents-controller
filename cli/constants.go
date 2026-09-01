@@ -1,6 +1,6 @@
 package main
 
-var prAuthenticationProvider = PrInfo{939, "helm", "authentication-provider"}
+var prAuthenticationProvider = PrInfo{2223, "helm", "authentication-provider"}
 var prChAuthority = PrInfo{1402, "helm", "ch-authority"}
 var prChConsumer = PrInfo{1404, "helm", "ch-consumer"}
 var prChProvider = PrInfo{1403, "helm", "ch-provider"}
@@ -19,7 +19,7 @@ var prFeUsersAndRoles = PrInfo{1999, "helm", "fe-users-and-roles"}
 var prIdentityProvider = PrInfo{2119, "helm", "identity-provider"}
 var prKeycloakAuthenticator = PrInfo{2214, "maven", "keycloak-authenticator"}
 var prOnboarding = PrInfo{2097, "helm", "onboarding"}
-var prSecurityAttributesProvider = PrInfo{861, "helm", "security-attributes-provider"}
+var prSecurityAttributesProvider = PrInfo{2225, "helm", "security-attributes-provider"}
 var prSimplHttpClient = PrInfo{859, "helm", "simpl-http-client"}
 var prTier1Authentication = PrInfo{1457, "helm", "tier1-authentication"}
 var prTier1Gateway = PrInfo{772, "helm", "tier1-gateway"}

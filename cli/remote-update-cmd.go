@@ -294,7 +294,7 @@ type ProjectInfo struct {
 }
 
 var projectIdByTargetName = map[string]ProjectInfo{
-	"auth_provider.targetRevision":                          {"helm", 939},
+	"auth_provider.targetRevision":                          {"helm", 2223},
 	"authentication_provider_fe.targetRevision":             {"helm", 1308},
 	"consent_management.targetRevision":                     {"helm", 1723},
 	"consent_management_fe.targetRevision":                  {"helm", 1950},
@@ -308,7 +308,7 @@ var projectIdByTargetName = map[string]ProjectInfo{
 	"keycloak.keycloak_authenticator.targetRevision":        {"maven", 2214},
 	"keycloak.oid4vp_keycloak_extension.targetRevision":     {"maven", 1840},
 	"onboarding.targetRevision":                             {"helm", 2097},
-	"sap.targetRevision":                                    {"helm", 861},
+	"sap.targetRevision":                                    {"helm", 2225},
 	"tier1_gateway.targetRevision":                          {"helm", 2112},
 	"tier2_gateway.targetRevision":                          {"helm", 2215},
 	"tier2_proxy.targetRevision":                            {"helm", 1112},
