@@ -126,7 +126,7 @@ fe_users_roles:
       memory: "512Mi"
 fe_identity_provider:
   enabled: true
-  projectID: "1311"
+  projectID: "2120"
   targetRevision: 2.10.4
   chart_name: fe-identity-provider
   resources:
@@ -138,7 +138,7 @@ fe_identity_provider:
       memory: "512Mi"
 fe_onboarding:
   enabled: true
-  projectID: "1307"
+  projectID: "2098"
   targetRevision: 2.12.1
   chart_name: fe-onboarding
   resources:
@@ -362,7 +362,7 @@ fe_users_roles:
       memory: "512Mi"
 fe_identity_provider:
   enabled: true
-  projectID: "1311"
+  projectID: "2120"
   targetRevision: 2.10.4
   chart_name: fe-identity-provider
   resources:
@@ -374,7 +374,7 @@ fe_identity_provider:
       memory: "512Mi"
 fe_onboarding:
   enabled: true
-  projectID: "1307"
+  projectID: "2098"
   targetRevision: 2.12.1
   chart_name: fe-onboarding
   resources:

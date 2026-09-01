@@ -637,12 +637,12 @@ cat << 'EOF' | grep -E ",${NAME},"
 helm,tier1_gateway,2112
 helm,sap,861
 helm,users_roles,2000
-helm,fe_auth_provider,1308
 helm,authentication_provider_fe,1308
-helm,fe_users_roles,1999
-helm,fe_identity_provider,1311
-helm,fe_onboarding,1307
+helm,fe_auth_provider,1308
+helm,fe_identity_provider,2120
+helm,fe_onboarding,2098
 helm,fe_security_attribute_provider,1309
+helm,fe_users_roles,1999
 helm,auth_provider_fe,1308
 helm,users_roles_fe,1999
 helm,identity_provider_fe,1311
@@ -655,7 +655,7 @@ helm,auth_provider,939
 helm,tier2_proxy,1112
 helm,consent_management,1723
 helm,consent_management_fe,1950
-jar,keycloak_authenticator,915/packages/maven/eu/europa/ec/simpl/keycloak-authenticator
+jar,keycloak_authenticator,2214/packages/maven/eu/europa/ec/simpl/keycloak-authenticator
 jar,eidas_demo_keycloak_extension,1313/packages/maven/eu/europa/ec/simpl/eidas-demo-keycloak-extension
 jar,oid4vp_keycloak_extension,1840/packages/maven/eu/europa/ec/simpl/credential-verifier-keycloak-extension
 EOF
