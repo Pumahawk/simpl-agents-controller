@@ -65,7 +65,7 @@ var RemoteUpdateCmd = cmd.Cmd{
 		GetProjectLastVersion(versionsStore)
 		argoApp.UpdateParameters(versionsStore, depInfo)
 		if apply {
-			c := exec.Command("kubectl", "apply", "-f", "-")
+			c := exec.Command("kubectl", "apply", "--server-side", "-f", "-")
 			c.Stderr = os.Stderr
 			c.Stdout = os.Stdout
 			out, err := json.Marshal(argoApp)
