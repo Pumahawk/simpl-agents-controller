@@ -39,6 +39,7 @@ env_shell_expand = false
 
 [shell_alias]
 cli = "mise run --raw -q cli --"
+argoc = "mise run --raw -q argo:cli --"
 vers = "mise run --raw -q cli -- versions:get"
 
 [tools]
@@ -1050,6 +1051,10 @@ kubectl get -nargocd application  -oyaml | yq '.items[]  | "\\(.metadata.name) \
 [tasks."chart:update_participant"]
 shell = "bash -ec"
 file = "./scripts/align-participant-charts.bash"
+
+[tasks."yq:tags:check"]
+shell = "bash -ec"
+file = "./scripts/get_versions.sh"
 
 [tasks."chart:update_consumer"]
 shell = "bash -ec"
