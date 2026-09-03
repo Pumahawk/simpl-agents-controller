@@ -295,13 +295,13 @@ type ProjectInfo struct {
 
 var projectIdByTargetName = map[string]ProjectInfo{
 	"auth_provider.targetRevision":                          {"helm", 2223},
-	"authentication_provider_fe.targetRevision":             {"helm", 1308},
+	"authentication_provider_fe.targetRevision":             {"helm", 2224},
 	"consent_management.targetRevision":                     {"helm", 1723},
 	"consent_management_fe.targetRevision":                  {"helm", 1950},
-	"fe_auth_provider.targetRevision":                       {"helm", 1308},
+	"fe_auth_provider.targetRevision":                       {"helm", 2224},
 	"fe_identity_provider.targetRevision":                   {"helm", 2120},
 	"fe_onboarding.targetRevision":                          {"helm", 2098},
-	"fe_security_attribute_provider.targetRevision":         {"helm", 1309},
+	"fe_security_attribute_provider.targetRevision":         {"helm", 2226},
 	"fe_users_roles.targetRevision":                         {"helm", 1999},
 	"identity_provider.targetRevision":                      {"helm", 2119},
 	"keycloak.eidas_demo_keycloak_extension.targetRevision": {"maven", 1313},

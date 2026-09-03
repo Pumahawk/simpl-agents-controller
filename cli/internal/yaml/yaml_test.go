@@ -102,7 +102,7 @@ users_roles:
     - values.yaml
 fe_auth_provider:
   enabled: true
-  projectID: "1308"
+  projectID: "2224"
   targetRevision: 2.9.2
   chart_name: fe-authentication-provider
   resources:
@@ -150,7 +150,7 @@ fe_onboarding:
       memory: "512Mi"
 fe_security_attribute_provider:
   enabled: true
-  projectID: "1309"
+  projectID: "2226"
   targetRevision: 2.9.1
   chart_name: fe-security-attribute-provider
   resources:
@@ -338,7 +338,7 @@ users_roles:
     - values.yaml
 fe_auth_provider:
   enabled: true
-  projectID: "1308"
+  projectID: "2224"
   targetRevision: 2.9.2
   chart_name: fe-authentication-provider
   resources:
@@ -386,7 +386,7 @@ fe_onboarding:
       memory: "512Mi"
 fe_security_attribute_provider:
   enabled: true
-  projectID: "1309"
+  projectID: "2226"
   targetRevision: 2.9.1
   chart_name: fe-security-attribute-provider
   resources:
