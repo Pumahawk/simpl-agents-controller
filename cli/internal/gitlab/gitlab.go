@@ -38,7 +38,7 @@ func (c *Client) Packages(id, page, perpage int) ([]PackageItem, error) {
 		"/packages?" +
 		"sort=desc" +
 		"&page=" + strconv.Itoa(page) +
-		"&perpage=" + strconv.Itoa(perpage)
+		"&per_page=" + strconv.Itoa(perpage)
 
 	res, err := http.Get(rawUrl)
 	if err != nil {

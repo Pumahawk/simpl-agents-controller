@@ -36,7 +36,7 @@ func GetVersions(projectsInfo []PrInfo) <-chan Version {
 						}
 						items, err := glclient.Packages(info.Id, page, perpage)
 						if err != nil {
-							fmt.Fprintf(os.Stderr, "unable to retrieve projectId=%d", info.Id)
+							fmt.Fprintf(os.Stderr, "unable to retrieve package projectId=%d page=%d perpage=%d\n", info.Id, page, perpage)
 							return
 						}
 						if len(items) == 0 {

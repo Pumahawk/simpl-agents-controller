@@ -65,7 +65,7 @@ var RemoteUpdateCmd = cmd.Cmd{
 		GetProjectLastVersion(versionsStore)
 		argoApp.UpdateParameters(versionsStore, depInfo)
 		if apply {
-			c := exec.Command("kubectl", "apply", "--server-side", "-f", "-")
+			c := exec.Command("kubectl", "apply", "--server-side", "--force-conflicts", "-f", "-")
 			c.Stderr = os.Stderr
 			c.Stdout = os.Stdout
 			out, err := json.Marshal(argoApp)
@@ -362,5 +362,5 @@ func projectIdFromRepoUrl(repoURL string) (int, error) {
 	if len(m) == 2 {
 		return strconv.Atoi(m[1])
 	}
-	return -1, fmt.Errorf("unable to retrieve project id from repoURL %q", repoURL)
+	return -1, fmt.Errorf("unable to retrieve project id from repoURL %q\n", repoURL)
 }
