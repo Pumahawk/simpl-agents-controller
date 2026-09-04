@@ -294,7 +294,7 @@ type ProjectInfo struct {
 }
 
 var projectIdByTargetName = map[string]ProjectInfo{
-	"auth_provider.targetRevision":                          {"helm", 2223},
+	"auth_provider.targetRevision":                          {"helm", 2236},
 	"authentication_provider_fe.targetRevision":             {"helm", 2224},
 	"consent_management.targetRevision":                     {"helm", 1723},
 	"consent_management_fe.targetRevision":                  {"helm", 1950},

@@ -1,9 +1,9 @@
 package main
 
-var prAuthenticationProvider = PrInfo{2223, "helm", "authentication-provider"}
+var prAuthenticationProvider = PrInfo{2236, "helm", "authentication-provider"}
 var prChAuthority = PrInfo{2233, "helm", "ch-authority"}
 var prChConsumer = PrInfo{2234, "helm", "ch-consumer"}
-var prChProvider = PrInfo{2223, "helm", "ch-provider"}
+var prChProvider = PrInfo{2236, "helm", "ch-provider"}
 var prChParticipant = PrInfo{1492, "helm", "ch-participant"}
 var prCommon = PrInfo{796, "maven", "common"}
 var prConsentManagementBe = PrInfo{1723, "helm", "consent-management-be"}
