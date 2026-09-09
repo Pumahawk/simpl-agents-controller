@@ -34,6 +34,10 @@ function main() {
     shift
     packages "$@"
     ;;
+  mr:create)
+    shift
+    merge_requests_create "$@"
+    ;;
   *)
     c_giteu "$@"
     ;;
@@ -77,7 +81,59 @@ function merge_requests() {
 
 function packages() {
   prid="$(git_get_project_id)"
-  c_giteu "projects/$prid/packages" -G "$@" | apiout -r '.[] | "\(.id) \(.package_type) \(.name) \(.version) https://code.europa.eu\(._links.web_path)"'
+  c_giteu "projects/$prid/packages" -G "$@" | apiout -r '.[] | "\(.id) \(.package_type) \(.name) \(.version) \(.pipeline.ref) https://code.europa.eu\(._links.web_path)"'
+}
+
+function merge_requests_create() {
+  local source_branch="$(git branch --show-current)"
+  local target_branch="develop"
+  local title="$(git log --no-merges -1 --pretty=%s)"
+  while true; do
+    case "$1" in
+    --title)
+      title="$2"
+      shift
+      shift
+      ;;
+    --from)
+      source_branch="$2"
+      shift
+      shift
+      ;;
+    --to)
+      target_branch="$2"
+      shift
+      shift
+      ;;
+    *)
+      break
+      ;;
+    esac
+  done
+  if [ -z "$source_branch" ]; then
+    >&2 echo "Missing --from parameter"
+    return 1
+  fi
+  if [ -z "$target_branch" ]; then
+    >&2 echo "Missing --to parameter"
+    return 1
+  fi
+  if [ -z "$title" ]; then
+    >&2 echo "Missing --title parameter"
+    return 1
+  fi
+  prid="$(git_get_project_id)"
+  c_giteu /projects/"$prid"/merge_requests -X POST --data-raw "$(
+    jq -n -c \
+      --arg source "$source_branch" \
+      --arg target "$target_branch" \
+      --arg title "$title" \
+      '{
+         "source_branch":$source,
+         "target_branch":$target,
+         "title":$title,
+       }'
+  )" "$@" | apiout -r '"\(.project_id) \(.id) \(.web_url)"'
 }
 
 main "$@"
