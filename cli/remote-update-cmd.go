@@ -306,7 +306,7 @@ var projectIdByTargetName = map[string]ProjectInfo{
 	"identity_provider.targetRevision":                      {"helm", 2119},
 	"keycloak.eidas_demo_keycloak_extension.targetRevision": {"maven", 1313},
 	"keycloak.keycloak_authenticator.targetRevision":        {"maven", 2214},
-	"keycloak.oid4vp_keycloak_extension.targetRevision":     {"maven", 1840},
+	"keycloak.oid4vp_keycloak_extension.targetRevision":     {"maven", 2269},
 	"onboarding.targetRevision":                             {"helm", 2097},
 	"sap.targetRevision":                                    {"helm", 2225},
 	"tier1_gateway.targetRevision":                          {"helm", 2112},

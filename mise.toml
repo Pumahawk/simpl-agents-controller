@@ -659,7 +659,7 @@ helm,consent_management,1723
 helm,consent_management_fe,1950
 jar,keycloak_authenticator,2214/packages/maven/eu/europa/ec/simpl/keycloak-authenticator
 jar,eidas_demo_keycloak_extension,1313/packages/maven/eu/europa/ec/simpl/eidas-demo-keycloak-extension
-jar,oid4vp_keycloak_extension,1840/packages/maven/eu/europa/ec/simpl/credential-verifier-keycloak-extension
+jar,oid4vp_keycloak_extension,2269/packages/maven/eu/europa/ec/simpl/credential-verifier-keycloak-extension
 EOF
 }
 
