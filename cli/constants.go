@@ -1,6 +1,6 @@
 package main
 
-var prAuthenticationProvider = PrInfo{2236, "helm", "authentication-provider"}
+var prAuthenticationProvider = PrInfo{2223, "helm", "authentication-provider"}
 var prChAuthority = PrInfo{2233, "helm", "ch-authority"}
 var prChConsumer = PrInfo{2234, "helm", "ch-consumer"}
 var prChProvider = PrInfo{2236, "helm", "ch-provider"}

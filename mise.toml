@@ -653,7 +653,7 @@ helm,security_attribute_provider_fe,2226
 helm,onboarding,2097
 helm,tier2_gateway,2215
 helm,identity_provider,2119
-helm,auth_provider,2236
+helm,auth_provider,2223
 helm,tier2_proxy,1112
 helm,consent_management,1723
 helm,consent_management_fe,1950

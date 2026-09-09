@@ -206,7 +206,7 @@ identity_provider:
     - values.yaml
 auth_provider:
   enabled: true
-  projectID: "2236"
+  projectID: "2223"
   targetRevision: 2.12.3
   chart_name: authentication-provider
   resources:
@@ -442,7 +442,7 @@ identity_provider:
     - values.yaml
 auth_provider:
   enabled: true
-  projectID: "2236"
+  projectID: "2223"
   targetRevision: 2.12.3
   chart_name: authentication-provider
   resources:
