@@ -34,9 +34,17 @@ function main() {
     shift
     packages "$@"
     ;;
+  info)
+    shift
+    project_info "$@"
+    ;;
   mr:create)
     shift
     merge_requests_create "$@"
+    ;;
+  pips:run)
+    shift
+    pipeline_run "$@"
     ;;
   *)
     c_giteu "$@"
@@ -134,6 +142,41 @@ function merge_requests_create() {
          "title":$title,
        }'
   )" "$@" | apiout -r '"\(.project_id) \(.id) \(.web_url)"'
+}
+
+function project_info() {
+  prid="$(git_get_project_id)"
+  c_giteu "projects/$prid" -G "$@" | apiout -r '"\(.id) \(.path) \(.web_url)"'
+}
+
+function pipeline_run() {
+  local ref="$(git branch --show-current)"
+  local release="0"
+  while true; do
+    case "$1" in
+    --ref)
+      ref="$2"
+      shift 2
+      ;;
+    --release)
+      release="1"
+      shift
+      ;;
+    *)
+      break
+      ;;
+    esac
+  done
+  if [ -z "$ref" ]; then
+    >&2 echo "Missing --ref parameter"
+    return 1
+  fi
+  local variables="[]"
+  if [ "$release" == "1" ]; then
+    variables='[{"key":"RUN_RELEASE","value":"true"}]'
+  fi
+  prid="$(git_get_project_id)"
+  c_giteu "projects/$prid/pipeline?ref=$ref" -X POST --data-raw "$(jq --argjson variables "$variables" -n '{"variables": $variables}')" | apiout -r '"\(.project_id) \(.iid) \(.web_url)"'
 }
 
 main "$@"
