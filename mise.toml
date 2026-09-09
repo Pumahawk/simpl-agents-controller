@@ -39,6 +39,7 @@ env_shell_expand = false
 
 [shell_alias]
 cli = "mise run --raw -q cli --"
+giteu = "mise run --raw -q giteu --"
 argoc = "mise run --raw -q argo:cli --"
 vers = "mise run --raw -q cli -- versions:get"
 
@@ -1055,3 +1056,8 @@ run = "mise run -q chart:update_participant consumer-iaa"
 [tasks."chart:update_provider"]
 shell = "bash -ec"
 run = "mise run -q chart:update_participant provider-iaa"
+
+[tasks."giteu"]
+shell = "bash -ec"
+dir = "{{cwd}}"
+file = "./scripts/giteu.bash"
