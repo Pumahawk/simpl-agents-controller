@@ -305,15 +305,15 @@ function release_links() {
   curlp_tag=()
   tag_p="$1"
   [ -n "$tag_p" ] && tag_p+=(-d "search=$tag_p")
-  info="$(giteu --json info)"
+  info="$(JSON_OUT="1" project_info)"
   prid="$(echo "$info" | jq -r .id)"
   name="$(echo "$info" | jq -r .path)"
-  tag="$(giteu "projects/$prid/repository/tags" -G "${tag_p[@]}" -d per_page=1 | jq -r .[].name)"
-  releasej="$(giteu "projects/$prid/releases/$tag")"
+  tag="$(c_giteu "projects/$prid/repository/tags" -G "${tag_p[@]}" -d per_page=1 | jq -r .[].name)"
+  releasej="$(c_giteu "projects/$prid/releases/$tag")"
   description="$(echo "$releasej" | jq -r .description)"
   releaseurl="$(echo "$releasej" | jq -r ._links.self)"
-  fortify="$(echo "$description" | grep -e emea.fortify.com | grep -o "(.*)")"
-  sonar="$(echo "$description" | grep -e sonarqube.tools.simpl-europe.eu | grep -o "(.*)")"
+  fortify="$(echo "$description" | grep -e emea.fortify.com | grep -o "(.*)" || true)"
+  sonar="$(echo "$description" | grep -e sonarqube.tools.simpl-europe.eu | grep -o "(.*)" || true)"
   [ -z "$fortify" ] && fortify='"not-found"'
   [ -z "$sonar" ] && sonar='"not-found"'
   echo "$prid $name $tag type:release $releaseurl"
