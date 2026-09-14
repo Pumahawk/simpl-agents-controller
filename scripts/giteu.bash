@@ -38,6 +38,10 @@ function main() {
     shift
     packages "$@"
     ;;
+  tags)
+    shift
+    tags "$@"
+    ;;
   info)
     shift
     project_info "$@"
@@ -319,6 +323,11 @@ function release_links() {
   echo "$prid $name $tag type:release $releaseurl"
   echo "$prid $name $tag type:fortify $fortify"
   echo "$prid $name $tag type:sonar $sonar"
+}
+
+function tags() {
+  prid="$(git_get_project_id)"
+  c_giteu "projects/$prid/repository/tags" -G "$@" | apiout -r '.[] | "\(.name)"'
 }
 
 main "$@"
