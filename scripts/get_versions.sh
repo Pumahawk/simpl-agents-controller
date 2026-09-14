@@ -4,6 +4,7 @@ if [ ! -f "$file" ]; then
   >&2 echo "not found $file"
   exit 1
 fi
+shift
 yqc="$(getyqpr "$file"  | sed 's/^/./;s/$/ |/')"
 [ -n "$yqc" ] && yq -i "$yqc .=." $file
 }

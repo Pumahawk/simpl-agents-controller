@@ -58,8 +58,12 @@ function main() {
     shift
     release_links "$@"
     ;;
-  *)
+  api)
+    shift
     c_giteu "$@"
+    ;;
+  *)
+    echo "Command not found"
     ;;
   esac
 }
