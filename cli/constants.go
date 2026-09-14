@@ -24,7 +24,7 @@ var prSimplHttpClient = PrInfo{859, "helm", "simpl-http-client"}
 var prTier1Authentication = PrInfo{1457, "helm", "tier1-authentication"}
 var prTier1Gateway = PrInfo{772, "helm", "tier1-gateway"}
 var prTier2Gateway = PrInfo{2215, "helm", "tier2-gateway"}
-var prTier2Proxy = PrInfo{1112, "helm", "tier2-proxy"}
+var prTier2Proxy = PrInfo{2255, "helm", "tier2-proxy"}
 var prUsersRolesOld = PrInfo{771, "helm", "users-roles"}
 var prUsersRoles = PrInfo{2000, "helm", "users-roles"}
 

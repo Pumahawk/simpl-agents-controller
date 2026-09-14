@@ -311,7 +311,7 @@ var projectIdByTargetName = map[string]ProjectInfo{
 	"sap.targetRevision":                                    {"helm", 2225},
 	"tier1_gateway.targetRevision":                          {"helm", 2112},
 	"tier2_gateway.targetRevision":                          {"helm", 2215},
-	"tier2_proxy.targetRevision":                            {"helm", 1112},
+	"tier2_proxy.targetRevision":                            {"helm", 2255},
 	"users_roles.targetRevision":                            {"helm", 2000},
 	"users_roles_fe.targetRevision":                         {"helm", 1999},
 }
