@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+GLOBAL_PROJECT_ID=""
 GIT_BRANCH_REMOTE="origin"
 JSON_OUT="0"
 
@@ -9,6 +10,11 @@ function main() {
     case "$1" in
     --json)
       JSON_OUT="1"
+      shift
+      ;;
+    --project)
+      GLOBAL_PROJECT_ID="${2?Missing project parameter}"
+      shift
       shift
       ;;
     --remote)
@@ -203,7 +209,11 @@ function apiout() {
 }
 
 function git_get_project_id() {
-  git remote get-url "$GIT_BRANCH_REMOTE" | sed 's|https://code.europa.eu/||;s|.git||;s|/$||' | jq -Rr @uri
+  if [ -n "$GLOBAL_PROJECT_ID" ]; then
+    echo -n "$GLOBAL_PROJECT_ID" | jq -Rr @uri
+  else
+    git remote get-url "$GIT_BRANCH_REMOTE" | sed 's|https://code.europa.eu/||;s|.git||;s|/$||' | jq -Rr @uri
+  fi
 }
 
 function pipelines() {
