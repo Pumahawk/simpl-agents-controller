@@ -1,7 +1,8 @@
 #!/bin/bash
+set -e
 function redisc() {
-    local ns="${1?Missing namespace}"
-    shift
-    kubectl exec -i -n "$ns" redis-master-0 -- bash -c 'env REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli "$@"' -- "$@"
-  }
+  local ns="${1?Missing namespace}"
+  shift
+  kubectl exec -i -n "$ns" redis-master-0 -- bash -c 'env REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli "$@"' -- "$@"
+}
 redisc "$@"
