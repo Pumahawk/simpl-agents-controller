@@ -228,7 +228,7 @@ function merge_requests() {
 
 function packages() {
   prid="$(git_get_project_id)"
-  c_giteu "projects/$prid/packages" -G "$@" | apiout -r '.[] | "\(.id) \(.package_type) \(.name) \(.version) \(.pipeline.ref) https://code.europa.eu\(._links.web_path)"'
+  c_giteu "projects/$prid/packages?sort=desc" -G "$@" | apiout -r '.[] | "\(.id) \(.package_type) \(.name) \(.version) \(.pipeline.ref) https://code.europa.eu\(._links.web_path)"'
 }
 
 function merge_requests_create() {
