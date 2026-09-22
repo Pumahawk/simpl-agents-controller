@@ -218,7 +218,7 @@ function git_get_project_id() {
 
 function pipelines() {
   prid="$(git_get_project_id)"
-  c_giteu "projects/$prid/pipelines" -G "$@" | apiout -r '.[] | "\(.project_id) \(.id) \(.status) \(.ref) \(.created_at) \(.updated_at) \(.web_url)"'
+  c_giteu "projects/$prid/pipelines" -G "$@" | apiout -r '.[] | "\(.project_id) \(.id) \(.status) \(.ref) \(.sha[0:8]) \(.created_at) \(.updated_at) \(.web_url)"'
 }
 
 function merge_requests() {
