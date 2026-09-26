@@ -183,6 +183,22 @@ run = "kubectl exec -n \"${COMMON-common01}\" \"$(kubectl get pod -n \"${COMMON-
 shell = "bash -ec"
 run = "kubectl exec -it -n \"${COMMON-common01}\" \"$(kubectl get pod -n \"${COMMON-common01}\" -l spilo-role=master -oname)\" -- psql -U postgres"
 
+[tasks."cluster:db:json"]
+shell = "bash -ec"
+run = """
+function  cluster_db_json() {
+    local db="${1?Missing database name}";
+    local table="${2?Missing table name}";
+    local where_param="${3}";
+    local where=""
+    if [ -n "$where_param" ]; then
+      where="where $where_param"
+    fi
+    mise run -q cluster:db:exec -t -d "$db" -c "select row_to_json($table) from $table $where" | jq .
+  }
+cluster_db_json
+"""
+
 [tasks."cluster:db:get_connections_by_user"]
 shell = "bash -ec"
 run = """
