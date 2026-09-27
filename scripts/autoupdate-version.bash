@@ -15,7 +15,7 @@ function get_new_version() {
   local projectID="$(<<<"$prj" jq -r .projectID)"
   local basetag="v$(<<<"$prj" jq -r .targetRevision | cut -d. -f1,2)"
   local latestTargetRevision="$(c_giteu "projects/$projectID/repository/tags?search=^$basetag&page_size=1" | jq -r '.[0]?.name' | sed 's/^v//')"
-  jq -c -n --argjson prj "$prj"  --arg latestTargetRevision "$latestTargetRevision" '$prj + {"latestTargetRevision": $latestTargetRevision}'
+  jq -c -n --argjson prj "$prj" --arg latestTargetRevision "$latestTargetRevision" '$prj + {"latestTargetRevision": $latestTargetRevision}'
 }
 
 function fetch_project_tags_path() {
@@ -24,11 +24,15 @@ function fetch_project_tags_path() {
   prid="$(<<<"$prj" jq -r .projectID)"
   from="v$(<<<"$prj" jq -r .targetRevision)"
   to="v$(<<<"$prj" jq -r .latestTargetRevision)"
-  repo="$(giteu api "projects/$prid" | jq -r .http_url_to_repo)"
-  git fetch -n "$repo" +"refs/tags/$from:refs/from" +"refs/tags/$to:refs/to"
-  msg="$path ($from -> $to):
+  if [ "$from" != "$to" ]; then
+    repo="$(giteu api "projects/$prid" | jq -r .http_url_to_repo)"
+    git fetch -n "$repo" +"refs/tags/$from:refs/from" +"refs/tags/$to:refs/to"
+    msg="$path ($from -> $to):
 $(git log --grep Changelog: --no-merges --oneline refs/from..refs/to | sed 's/^/  /')"
-  <<<"$prj" jq -c --arg msg "$msg" '.+{"message":$msg}'
+    <<<"$prj" jq -c --arg msg "$msg" '.+{"message":$msg}'
+  else
+    <<<"$prj" jq -c --arg msg "$msg" '.+{"message":""}'
+  fi
 }
 
 function collect_updates() {
@@ -45,9 +49,9 @@ function collect_updates() {
     path="$(<<<"$prj" jq -r .path)"
     message="$(<<<"$prj" jq -r .message)"
     source_content_yaml="$(
-    echo "$source_content_yaml" |
-    latestTargetRevision="$latestTargetRevision" \
-    yq '('."$path"'.targetRevision) = strenv(latestTargetRevision)'
+      echo "$source_content_yaml" |
+        latestTargetRevision="$latestTargetRevision" \
+          yq '('."$path"'.targetRevision) = strenv(latestTargetRevision)'
     )"
     if [ -n "$message" ]; then
       msg="$message
@@ -62,17 +66,17 @@ $msg
 Changelog: fixed"
   fi
   source="$source_content_yaml" \
-  msg="$msg" \
-  yq -I0 -n -oj '{"message": strenv(msg), "source":strenv(source)}'
+    msg="$msg" \
+    yq -I0 -n -oj '{"message": strenv(msg), "source":strenv(source)}'
 }
 
 function get_version_from_pipeline_variables() {
- grep -w "PROJECT_VERSION_NUMBER" | grep -o '".*"' | sed 's/"//g'
+  grep -w "PROJECT_VERSION_NUMBER" | grep -o '".*"' | sed 's/"//g'
 }
 
 function update_release() {
-  prid="${1?Missing project id}"
-  remote_branch="${2?Missing remote branch}"
+  prid="$(git_get_project_id)"
+  remote_branch="${1?Missing remote branch}"
   repo="$(giteu api "projects/$prid" | jq -r .http_url_to_repo)"
   git fetch --depth=1 -n "$repo" +"refs/$remote_branch":refs/source
   source="$(git show refs/source:charts/values.yaml)"
@@ -84,7 +88,7 @@ function update_release() {
   ver_chart_new="$prefix.$final"
   out="$(
     echo "$source" | get_projects_info | while read -r line; do
-    echo $line | get_new_version | fetch_project_tags_path
+      echo $line | get_new_version | fetch_project_tags_path
     done | collect_updates "$source" "v$ver_chart_new"
   )"
   pipeline_var_content="$(<<<"$pipeline_var_content" sed '/PROJECT_VERSION_NUMBER/s/".*"/"'"$ver_chart_new"'"/')"
@@ -97,14 +101,14 @@ function update_release() {
     exit
   fi
 
-
   export GIT_INDEX_FILE="$(mktemp -u)"
   git read-tree refs/source
-  git update-index --add --cacheinfo 100644,"$pipeline_sha",pipeline.variables.sh 
-  git update-index --add --cacheinfo 100644,"$chart_sha",charts/values.yaml 
+  git update-index --add --cacheinfo 100644,"$pipeline_sha",pipeline.variables.sh
+  git update-index --add --cacheinfo 100644,"$chart_sha",charts/values.yaml
   tree="$(git write-tree)"
   commitID="$(git commit-tree "$tree" -m "$msg" -p "refs/source")"
   git update-ref refs/updated "$commitID"
+  echo "$commitID refs/updated"
 }
 
 function c_giteu() {
@@ -118,6 +122,14 @@ function c_giteu() {
     -H "content-type: application/json" \
     "${H_AUTH[@]}" \
     "https://code.europa.eu/api/v4/$path" "$@"
+}
+
+function git_get_project_id() {
+  if [ -n "$GLOBAL_PROJECT_ID" ]; then
+    echo -n "$GLOBAL_PROJECT_ID" | jq -Rr @uri
+  else
+    git remote get-url origin | sed 's|https://code.europa.eu/||;s|.git||;s|/$||' | jq -Rr @uri
+  fi
 }
 
 function log() {
