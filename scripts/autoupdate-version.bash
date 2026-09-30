@@ -78,7 +78,7 @@ function update_release() {
   prid="$(git_get_project_id)"
   remote_branch="${1?Missing remote branch}"
   repo="$(giteu api "projects/$prid" | jq -r .http_url_to_repo)"
-  git fetch --depth=1 -n "$repo" +"refs/$remote_branch":refs/source
+  git fetch -n "$repo" +"refs/$remote_branch":refs/source
   source="$(git show refs/source:charts/values.yaml)"
   pipeline_var_content="$(git show refs/source:pipeline.variables.sh)"
   ver_chart="$(<<<"$pipeline_var_content" get_version_from_pipeline_variables)"
