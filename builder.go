@@ -48,7 +48,17 @@ func main() {
 			log.Fatalf("Helm compilation error: %s", err)
 		}
 	case "docker-build":
-		if err := DockerBuild(); err != nil {
+		info, err := GetRepoInfo()
+		if err != nil {
+			log.Fatalf("unable to retrieve project info: %s", err)
+		}
+		vers, err := GetProjectVersionFromPipelineVariablesFile()
+		if err != nil {
+			log.Fatalf("unable to retrieve project version from pipeline file: %s", err)
+		}
+
+		dockerImage := RetrieveDockerImage(info, vers)
+		if err := DockerBuild(dockerImage); err != nil {
 			log.Fatalf("Docker compilation error: %s", err)
 		}
 	default:
@@ -113,17 +123,7 @@ func HelmBuild() error {
 	return nil
 }
 
-func DockerBuild() error {
-	info, err := GetRepoInfo()
-	if err != nil {
-		return fmt.Errorf("unable to retrieve project info: %w", err)
-	}
-	vers, err := GetProjectVersionFromPipelineVariablesFile()
-	if err != nil {
-		return fmt.Errorf("unable to retrieve project version from pipeline file: %w", err)
-	}
-
-	dockerImage := RetrieveDockerImage(info, vers)
+func DockerBuild(dockerImage string) error {
 
 	miseargs := []string{
 		"x",
