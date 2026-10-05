@@ -78,6 +78,7 @@ func Doctor() error {
 
 func LoadFlags() error {
 	flag.BoolVar(&skipJavaTests, "skip-tests", false, "")
+	flag.StringVar(&dockerImage, "docker-image", "", "")
 	flag.Parse()
 	return nil
 }
@@ -154,7 +155,7 @@ func GetProjectIdFromGitRemote() (string, error) {
 	ru := out.String()
 	ru = strings.Trim(ru, "\n\r \t")
 	if !strings.HasPrefix(ru, "https://code.europa.eu/") {
-		return "", fmt.Errorf("unknown git repository host %q: %w")
+		return "", fmt.Errorf("unknown git repository host %q", ru)
 	}
 	ru = regexp.MustCompile("^https://code.europa.eu/").ReplaceAllString(ru, "")
 	ru = regexp.MustCompile("\\.git/?$").ReplaceAllString(ru, "")
@@ -185,7 +186,7 @@ func GetRepoInfo() (*RepoInfo, error) {
 		return nil, err
 	}
 	defer res.Body.Close()
-	if res.StatusCode < 200 && res.StatusCode >= 300 {
+	if res.StatusCode < 200 || res.StatusCode >= 300 {
 		return nil, fmt.Errorf("unable to get project path code=%d projectID=%q: %w", res.StatusCode, prid, err)
 	}
 	rinfo := &RepoInfo{}
@@ -212,6 +213,9 @@ func GetProjectVersionFromPipelineVariablesFile() (string, error) {
 				return "", fmt.Errorf("unable to extract version from PROJECT_VERSION_NUMBER line")
 			}
 		}
+	}
+	if err := sc.Err(); err != nil {
+		return "", err
 	}
 	return "", fmt.Errorf("not found version in pipeline attributes file")
 }
