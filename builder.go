@@ -50,9 +50,11 @@ func main() {
 }
 
 func Doctor() error {
-	mise := exec.Command("mise", "--version")
-	if err := mise.Run(); err != nil {
+	if err := exec.Command("mise", "--version").Run(); err != nil {
 		return fmt.Errorf("missing mise dependency: %w", err)
+	}
+	if err := exec.Command("git", "--version").Run(); err != nil {
+		return fmt.Errorf("missing git dependency: %w", err)
 	}
 	return nil
 }
