@@ -24,7 +24,7 @@ var depMaven = "mvnd@1.0"
 var depHelm = "helm@4.1.1"
 var depDocker = "docker-cli@28.4"
 
-var dockerImage string = "temp-image-docker"
+var dockerImage string
 
 func main() {
 	if err := LoadFlags(); err != nil {
@@ -114,6 +114,17 @@ func HelmBuild() error {
 }
 
 func DockerBuild() error {
+	info, err := GetRepoInfo()
+	if err != nil {
+		return fmt.Errorf("unable to retrieve project info: %w", err)
+	}
+	vers, err := GetProjectVersionFromPipelineVariablesFile()
+	if err != nil {
+		return fmt.Errorf("unable to retrieve project version from pipeline file: %w", err)
+	}
+
+	dockerImage := RetrieveDockerImage(info, vers)
+
 	miseargs := []string{
 		"x",
 		depDocker,
@@ -151,7 +162,7 @@ func GetProjectIdFromGitRemote() (string, error) {
 }
 
 type RepoInfo struct {
-	Id                string `json:"id"`
+	Id                int    `json:"id"`
 	Name              string `json:"name"`
 	Path              string `json:"path"`
 	PathWithNamespace string `json:"path_with_namespace"`
@@ -203,4 +214,16 @@ func GetProjectVersionFromPipelineVariablesFile() (string, error) {
 		}
 	}
 	return "", fmt.Errorf("not found version in pipeline attributes file")
+}
+
+func RetrieveDockerImage(info *RepoInfo, version string) string {
+	if dockerImage == "" {
+		return GenerateDockerImage(info, version)
+	} else {
+		return dockerImage
+	}
+}
+
+func GenerateDockerImage(info *RepoInfo, version string) string {
+	return fmt.Sprintf("code.europa.eu/%s:%s-local.0.00000000", info.PathWithNamespace, version)
 }
