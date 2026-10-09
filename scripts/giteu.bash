@@ -68,6 +68,10 @@ function main() {
     shift
     c_giteu "$@"
     ;;
+  api:pr)
+    shift
+    api_project "$@"
+    ;;
   *)
     echo "Command not found"
     ;;
@@ -204,7 +208,7 @@ function apiout() {
   if [ "$JSON_OUT" == "1" ]; then
     jq "."
   else
-    jq "$@" | column --table
+    jq "$@" | tac | column --table
   fi
 }
 
@@ -286,6 +290,13 @@ function merge_requests_create() {
 function project_info() {
   prid="$(git_get_project_id)"
   c_giteu "projects/$prid" -G "$@" | apiout -r '"\(.id) \(.path) \(.web_url)"'
+}
+
+function api_project() {
+  prid="$(git_get_project_id)"
+  uri="$1"
+  shift
+  c_giteu "projects/$prid/$uri" "$@"
 }
 
 function pipeline_run() {
