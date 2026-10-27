@@ -222,7 +222,7 @@ function git_get_project_id() {
 
 function pipelines() {
   prid="$(git_get_project_id)"
-  c_giteu "projects/$prid/pipelines" -G "$@" | apiout -r '.[] | "\(.project_id) \(.id) \(.status) \(.ref) \(.sha[0:8]) \(.created_at) \(.updated_at) \(.web_url)"'
+  c_giteu "projects/$prid/pipelines" -G "$@" | apiout -r '.[] | "\(.project_id) \(.id) \(.status) \(.ref) \(.sha[0:100]) \(.created_at) \(.updated_at) \(.web_url)"'
 }
 
 function merge_requests() {
@@ -302,6 +302,7 @@ function api_project() {
 function pipeline_run() {
   local ref="$(git branch --show-current)"
   local release="0"
+  local sonar="0"
   while true; do
     case "$1" in
     --ref)
@@ -311,6 +312,10 @@ function pipeline_run() {
       ;;
     --release)
       release="1"
+      shift
+      ;;
+    --sonar)
+      sonar="1"
       shift
       ;;
     *)
@@ -325,6 +330,8 @@ function pipeline_run() {
   local variables="[]"
   if [ "$release" == "1" ]; then
     variables='[{"key":"RUN_RELEASE","value":"true"}]'
+  elif [ "$sonar" == "1" ]; then
+    variables='[{"key":"FORCE_SONAR","value":"true"}]'
   fi
   prid="$(git_get_project_id)"
   c_giteu "projects/$prid/pipeline?ref=$ref" -X POST --data-raw "$(jq --argjson variables "$variables" -n '{"variables": $variables}')" | apiout -r '"\(.project_id) \(.iid) \(.web_url)"'
