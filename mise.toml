@@ -1086,5 +1086,5 @@ file = "./scripts/redisc"
 [tasks."argo:state"]
 shell = "bash -ec"
 run = """
- kubectl get -n argocd application  -oyaml | yq '.items[] | .metadata.name as $name | .status.operationState as $state | "\\($name) \\($state.phase) \\($state.message)"'   | column -t -l 3
+ kubectl get -n argocd application  -oyaml | yq '.items[] | .metadata.name as $name | .status.operationState as $state | "\\($name) \\($state.phase) \\($state.startedAt) \\($state.message)"'   | column -t -l 4
 """
