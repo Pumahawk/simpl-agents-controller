@@ -14,7 +14,7 @@ function get_new_version() {
   read -r prj
   local projectID="$(<<<"$prj" jq -r .projectID)"
   local basetag="v$(<<<"$prj" jq -r .targetRevision | cut -d. -f1,2)"
-  local latestTargetRevision="$(c_giteu "projects/$projectID/repository/tags?search=^$basetag&page_size=1" | jq -r '.[0]?.name' | sed 's/^v//')"
+  local latestTargetRevision="$(c_giteu "projects/$projectID/repository/tags?search=^$basetag&page_size=1" | jq -r '[.[] | select(.name | test("-rc") | not)] | .[0]?.name' | sed 's/^v//')"
   jq -c -n --argjson prj "$prj" --arg latestTargetRevision "$latestTargetRevision" '$prj + {"latestTargetRevision": $latestTargetRevision}'
 }
 
