@@ -232,7 +232,7 @@ function merge_requests() {
 
 function packages() {
   prid="$(git_get_project_id)"
-  c_giteu "projects/$prid/packages?sort=desc" -G "$@" | apiout -r '.[] | "\(.id) \(.package_type) \(.name) \(.version) \(.pipeline.ref) https://code.europa.eu\(._links.web_path)"'
+  c_giteu "projects/$prid/packages?sort=desc" -G "$@" | apiout -r '.[] | "\(.id) \(.package_type) \(.name) \(.version) \(.pipeline.ref) \(.pipeline.updated_at) https://code.europa.eu\(._links.web_path)"'
 }
 
 function merge_requests_create() {
@@ -344,7 +344,7 @@ function release_links() {
   info="$(JSON_OUT="1" project_info)"
   prid="$(echo "$info" | jq -r .id)"
   name="$(echo "$info" | jq -r .path)"
-  tag="$(c_giteu "projects/$prid/repository/tags" -G "${tag_p[@]}" -d per_page=1 | jq -r .[].name)"
+  tag="$(c_giteu "projects/$prid/repository/tags" -G "${tag_p[@]}" -d per_page=100 | jq -r .[].name | grep -v -e -rc | sort -V | tac | head -n 1)"
   releasej="$(c_giteu "projects/$prid/releases/$tag")"
   description="$(echo "$releasej" | jq -r .description)"
   releaseurl="$(echo "$releasej" | jq -r ._links.self)"
