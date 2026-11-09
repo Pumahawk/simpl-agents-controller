@@ -720,7 +720,16 @@ argo_sync
 [tasks."argo:sync_all"]
 run = """
 mise run \\
-    argo:sync authority-iaa-01 \\
+    argo:sync iaadsdevauthority \\
+::: argo:sync iaadsdevconsumer \\
+::: argo:sync iaadsdevdataprovider \\
+::: argo:sync iaadstestauthority \\
+::: argo:sync iaadstestconsumer \\
+::: argo:sync iaadstestdataprovider \\
+::: argo:sync iaadstestauthority \\
+::: argo:sync iaadstestconsumer \\
+::: argo:sync iaadstestdataprovider \\
+::: argo:sync authority-iaa-01 \\
 ::: argo:sync consumer-iaa-01 \\
 ::: argo:sync provider-iaa-01 \\
 ::: argo:sync iaadsstagingconsumer \\
@@ -798,6 +807,8 @@ environment_remote_update
 run = """
 timeout 10m mise run cli remote:update \\
 authority-iaa-01-deployer:develop consumer-iaa-01-deployer:develop provider-iaa-01-deployer:develop \\
+iaadsdevauthority-deployer:develop iaadsdevconsumer-deployer:develop iaadsdevdataprovider-deployer:develop \\
+iaadstestauthority-deployer:develop iaadstestconsumer-deployer:develop iaadstestdataprovider-deployer:develop \\
 iaadsautomationauthority-deployer:develop iaadsautomationconsumer-deployer:develop iaadsautomationdataprovider-deployer:develop \\
 iaadsstagingauthority-deployer:main iaadsstagingconsumer-deployer:main iaadsstagingdataprovider-deployer:main
 wait
