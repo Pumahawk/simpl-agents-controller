@@ -732,8 +732,6 @@ mise run \\
 ::: argo:sync authority-iaa-01 \\
 ::: argo:sync consumer-iaa-01 \\
 ::: argo:sync provider-iaa-01 \\
-::: argo:sync iaadsstagingconsumer \\
-::: argo:sync iaadsstagingdataprovider \\
 ::: argo:sync iaadsautomationauthority \\
 ::: argo:sync iaadsautomationconsumer \\
 ::: argo:sync iaadsautomationdataprovider
@@ -809,8 +807,7 @@ timeout 10m mise run cli remote:update \\
 authority-iaa-01-deployer:develop consumer-iaa-01-deployer:develop provider-iaa-01-deployer:develop \\
 iaadsdevauthority-deployer:develop iaadsdevconsumer-deployer:develop iaadsdevdataprovider-deployer:develop \\
 iaadstestauthority-deployer:develop iaadstestconsumer-deployer:develop iaadstestdataprovider-deployer:develop \\
-iaadsautomationauthority-deployer:develop iaadsautomationconsumer-deployer:develop iaadsautomationdataprovider-deployer:develop \\
-iaadsstagingauthority-deployer:main iaadsstagingconsumer-deployer:main iaadsstagingdataprovider-deployer:main
+iaadsautomationauthority-deployer:develop iaadsautomationconsumer-deployer:develop iaadsautomationdataprovider-deployer:develop
 wait
 """
 
